@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore the Cafe Menu at Ascend Climbing in Jhamsikhel, Lalitpur. Fuel your climb with our selection of coffee, food, and refreshers.">
+    <meta property="og:title" content="Cafe Menu - Climbing Gym in Jhamsikhel, Lalitpur - Ascend Climbing">
+    <meta property="og:description" content="Explore the Cafe Menu at Ascend Climbing in Jhamsikhel, Lalitpur. Fuel your climb with our selection of coffee, food, and refreshers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ascendclimbing.com.np/cafe.html">
+    <title>Cafe Menu - Climbing Gym in Jhamsikhel, Lalitpur - Ascend Climbing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="grid-container">
+        <div class="grid-row compact">
+            <div class="col-1">
+                <a href="index.html#landing" class="nav-brand">Ascend Climbing</a>
+            </div>
+            <div class="col-2">
+                <nav class="nav-links">
+                    <a href="index.html#landing">Index</a>/<a href="cafe.html">Cafe</a>/<a
+                        href="index.html#pricing">Pricing</a>/<a href="index.html#kids">Activities</a>/<a
+                        href="index.html#about">About</a>
+                </nav>
+            </div>
+            <div class="col-3 flex justify-end items-center">
+                <a href="index.html#contact" class="nav-contact">[Contact]</a>
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="grid-container">
+        <section id="menu-page" class="scroll-section no-pad">
+            <div class="menu-container animate-up">
+                <h1 class="menu-main-title">Menu</h1>
+
+                <div class="menu-grid">
+                    <div class="menu-section">
+                        <h2>Coffee</h2>
+                        <div class="menu-row"><span>Espresso/Doppio</span> <span>120/160 [iced-250]</span></div>
+                        <div class="menu-row"><span>Americano</span> <span>180/220 [iced-320]</span></div>
+                        <div class="menu-row"><span>Cappuccino/Latte</span> <span>280</span></div>
+                    </div>
+
+                    <div class="menu-section">
+                        <h2>Tea & Refreshers</h2>
+                        <div class="menu-row"><span>Black/Milk/Lemon</span> <span>70/120/100</span></div>
+                        <div class="menu-row"><span>Iced Tea (Peach/Apple)</span> <span>200/220</span></div>
+                        <div class="menu-row"><span>Hot Lemon (Ginger/Honey)</span> <span>100(30/80)</span></div>
+                    </div>
+
+                    <div class="menu-section">
+                        <h2>Food</h2>
+                        <div class="menu-row"><span>Momo(veg/chi/buf/por)</span> <span>220/300/290/340</span></div>
+                        <div class="menu-row"><span>Chowmein(chi/egg)</span> <span>250(100/50)</span></div>
+                        <div class="menu-row"><span>Fried Rice(chi/egg)</span> <span>300(100/50)</span></div>
+                        <div class="menu-row"><span>Sandwich(chi/mus/tom)</span> <span>600/350/280</span></div>
+                        <div class="menu-row"><span>Honey Banana Peanut Butter</span> <span>250</span></div>
+                        <div class="menu-row"><span>Grilled Chicken Salad</span> <span>600</span></div>
+                        <div class="menu-row"><span>Mix Veggie Salad</span> <span>280</span></div>
+                    </div>
+
+                    <div class="menu-section">
+                        <h2>Sides</h2>
+                        <div class="menu-row"><span>French Fries</span> <span>300</span></div>
+                        <div class="menu-row"><span>Chilli Chicken</span> <span>350</span></div>
+                        <div class="menu-row"><span>Hot Wings</span> <span>420</span></div>
+                        <div class="menu-row"><span>Chicken Sandeko</span> <span>350</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact" class="grid-container" style="padding-top: 4rem; padding-bottom: 4rem;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+            <div class="col-1">
+                <p>&copy; 2026 A South City Entertainment Pvt. Ltd.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-view');
+                    }
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.scroll-section').forEach(s => observer.observe(s));
+
+            // Mobile toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('mobile-active');
+                document.body.classList.toggle('menu-open');
+            });
+        });
+    </script>
+</body>
+
+</html>

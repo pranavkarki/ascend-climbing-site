@@ -1,0 +1,4 @@
+.DS_Store
+*.af~lock~
+.agents/
+.gemini/
