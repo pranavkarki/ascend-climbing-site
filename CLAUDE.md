@@ -47,7 +47,7 @@ CDN script order in HTML (order matters):
 
 ### CSS Variables (`:root` in `styles.css`)
 ```
---bg-color: #171717
+--bg-color: #0e0e0e
 --text-color: #FAFAFA
 --link-highlight: #0000CD  (blue fill on link hover)
 --font-mono: 'Inconsolata', ui-monospace, ...
@@ -128,16 +128,16 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 - Triggered from `top bottom` to `top top` of parent `.scroll-section`
 - **Initialized inside `initPreloader` callback** — not at DOMContentLoaded
 
-### 5. Scramble Text on Hover
+### 6. Scramble Text on Hover
 - Applied to all `<a>` with no child elements
 - Custom GSAP tween cycles random chars, resolving L→R to original text over 0.7s
 - Stores original text in `data-original-text` attribute
 
-### 6. Hamburger Menu
+### 7. Hamburger Menu
 - Toggle `.menu-toggle` adds/removes `.active` (animates spans to X) and `.mobile-active` on `.nav-links`
 - Also toggles `menu-open` on `<body>` (disables `mix-blend-mode: difference` on header)
 
-### 7. Header Height CSS Var
+### 8. Header Height CSS Var
 - `updateHeaderHeight()` sets `--header-height` on `:root` to actual header pixel height
 - Runs on load and `resize`
 
