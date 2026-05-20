@@ -13,11 +13,12 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing hero, Pricing, Activities (Kids/Adult Courses), Features, Footer |
+| `index.html` | Main page: Landing hero, Pricing, Activities (Kids/Adult Courses), Features (Cafe/Gym/Shower subsections), Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles — single shared file |
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
 | `img/square/` | 9 square climbing photos for fullscreen preloader roulette |
+| `img/optimized/` | Optimised assets — `wall.jpg` (hero bg), `cafe.avif` (cafe feature subsection) |
 | `img/` | Larger gym photos (JPG/WEBP) |
 | `fonts/` | Local font files — `Gandur New-Light.otf` |
 | `ref/` | Course images (`kids_image.png`, `adult_image.png`), logo, reference screenshots |
@@ -59,10 +60,11 @@ CDN script order in HTML (order matters):
 --line-thickness: 0.5pt
 --line-color: #FAFAFA
 --header-height: 72px  (also set dynamically via JS)
+--gutter: 2vw          (page side padding — used by .grid-container, .landing-row, and #landing negative margins. Change only this to resize gutters site-wide)
 ```
 
 ### Grid System
-- `.grid-container` → `padding: 0 4%` (page gutters)
+- `.grid-container` → `padding: 0 var(--gutter)` (page gutters — controlled by `--gutter: 2vw` in `:root`)
 - `.grid-row` → `grid-template-columns: repeat(3, 1fr)`, `gap: 2rem`, `padding: 1.5rem 0`
 - Columns addressed as `.col-1`, `.col-2`, `.col-3`
 - `.grid-row.compact` → reduced padding
@@ -73,7 +75,7 @@ CDN script order in HTML (order matters):
 - `h1` (standard): 128px, weight 500, uppercase, line-height 1
 - `.landing-brand`: Gandur New (fallback Bebas Neue), weight 300, `clamp(72px, 14vw, 200px)`, line-height 0.88, white — primary landing hero text
 - `.landing-climbing-sub`: Inconsolata, 24px (16px mobile), weight 600, uppercase, letter-spacing 0.35em
-- `.landing-tagline`: Inconsolata, 14px, uppercase, letter-spacing 0.2em, opacity 0.65
+- `.landing-tagline`: Inconsolata, 14px, uppercase, letter-spacing 0.2em, opacity 1
 - `h2`: 96px, weight 700, uppercase
 - `h3`: 24px, weight 600
 - Body/p/span/li/a: 14px, weight 400
@@ -92,11 +94,11 @@ CDN script order in HTML (order matters):
 
 | Class | Behaviour |
 |-------|-----------|
-| `.landing-inner` | Flex column, centered, `gap: 1rem` — wraps all landing content |
+| `.landing-inner` | Flex column, centered, `gap: 1rem`, `opacity: 0.8` — wraps all landing content |
 | `.landing-geo` | Inline SVG geometric mark (2 rows of 2 circles + 4 triangles), `clamp(90px, 23vw, 190px)` wide, `overflow: visible`. First triangle in each row is equilateral (apex at x=143). Triangles chain tip-to-base: 100→143→173→191→202. `#geo-circle-tr` = top-right circle; `#geo-tri-a` = bottom-left triangle (animated) |
 | `.landing-brand` | Primary hero text — Gandur New, weight 300, `clamp(72px, 14vw, 200px)` |
 | `.landing-climbing-sub` | "Climbing and Bouldering" subtitle — uppercase, spaced, 24px |
-| `.landing-tagline` | "The Wall in the South" — 14px, 0.65 opacity, `width: 100%` for correct desktop centering |
+| `.landing-tagline` | "The Wall in the South" — 14px, opacity 1, `width: 100%` for correct desktop centering |
 | `.landing-heading` | Legacy class (still in CSS, not used in HTML) |
 | `.scroll-section` | Marks a section for GSAP scroll animation |
 | `.animate-up` | Initial state: `opacity:0; transform:translateY(40px)` — GSAP animates in |
@@ -110,6 +112,12 @@ CDN script order in HTML (order matters):
 | `.mt-auto`, `.mb-2`, `.pt-1`, `.pt-2` | Spacing utilities |
 | `.menu-toggle` | Hamburger button — **direct child of `<body>`**, not inside `<header>`; fixed position on mobile (≤992px), `z-index: 2000` |
 | `.mobile-active` | Added to `.nav-links` when hamburger is open |
+| `.features-grid` | 2-col grid for Features subsections (`repeat(2,1fr)`), collapses to 1-col at ≤992px. `row-gap: 6rem; column-gap: 10rem`. **Direct child of `<section id="features">`, not inside `.grid-container`** — has no side padding of its own |
+| `.feature-item` | Flex column wrapper for one feature subsection (index label + image + heading) |
+| `.feature-img-wrap` | Image container — `aspect-ratio: 4/3`, `overflow: hidden`, `background-color: #0000CD` (blue shows before reveal). Has an `img` for real photos, empty for placeholders |
+| `.feature-img-placeholder` | Added to `.feature-img-wrap` when no real image yet — overrides to `background-color: #000` (black), while `.feature-img-wrap` itself is blue (`#0000CD`) |
+| `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
+| `.feature-index` | `[001]` / `[002]` / `[003]` label above each image — green `#39FF14`, monospace, `letter-spacing: 0.1em`, same style as section header subtitles |
 
 ---
 
@@ -127,7 +135,7 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 
 ### 2. Header & Landing Entrance Animations
 - Header: slides down from `-100%` y + fades in, duration 0.7s, `power3.out`, delay 0.1s
-- `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s
+- `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s, `clearProps: 'transform'` — required to restore CSS `transform: translateX(-50%)` centering after GSAP finishes
 - Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
 - `onComplete` on the entrance timeline calls `startHeroIdleAnimations()`
 
@@ -172,7 +180,15 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - Toggle `.menu-toggle` adds/removes `.active` (animates spans to X) and `.mobile-active` on `.nav-links`
 - Also toggles `menu-open` on `<body>` (disables `mix-blend-mode: difference` on header)
 
-### 11. Header Height CSS Var
+### 11. Feature Image/Placeholder Reveal
+- Loops over every `.feature-img-wrap` at `DOMContentLoaded`
+- **With `img`**: sets `clipPath: inset(100% 0% 0% 0%)`, `filter: blur(2px)`, `scale: 1.03`, `opacity: 1` on the `img`. On scroll-in: wipes up (0.6s, `power3.out`), then clears blur + scale (0.2s, `power2.out`)
+- **Without `img`** (placeholder): sets `clipPath: inset(100% 0% 0% 0%)` on the wrap div itself, wipes up the blue box (0.6s, `power3.out`)
+- `toggleActions: 'play none none reverse'` — reverses on scroll-up, replays on scroll-down
+- Adding a real `<img>` to a placeholder automatically uses the blur+wipe path — no JS changes needed
+- Scale `1.03 → 1` during unblur prevents the blur from bleeding past `overflow: hidden` and showing the blue background at the edge
+
+### 12. Header Height CSS Var
 - `updateHeaderHeight()` sets `--header-height` on `:root` to actual header pixel height
 - Runs on load and `resize`
 

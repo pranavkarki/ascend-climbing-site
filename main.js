@@ -77,6 +77,23 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
 
+    // Feature image/placeholder reveal: wipes up from blue background
+    document.querySelectorAll('.feature-img-wrap').forEach(wrap => {
+        const img = wrap.querySelector('img');
+        const trigger = wrap.closest('.feature-item');
+        const scrollTriggerConfig = { trigger, start: 'top 85%', toggleActions: 'play none none reverse' };
+
+        if (img) {
+            gsap.set(img, { clipPath: 'inset(100% 0% 0% 0%)', filter: 'blur(2px)', scale: 1.03, opacity: 1 });
+            gsap.timeline({ scrollTrigger: scrollTriggerConfig })
+                .to(img, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'power3.out' })
+                .to(img, { filter: 'blur(0px)', scale: 1, duration: 0.2, ease: 'power2.out' });
+        } else {
+            gsap.set(wrap, { clipPath: 'inset(100% 0% 0% 0%)' });
+            gsap.to(wrap, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'power3.out', scrollTrigger: scrollTriggerConfig });
+        }
+    });
+
     ScrollTrigger.refresh();
 
     const updateNavDateTime = () => {
@@ -120,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', onScroll, { passive: true });
 
     gsap.from(header, { yPercent: -100, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform' });
-    gsap.from('.menu-toggle', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.8 });
+    gsap.from('.menu-toggle', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
 
     gsap.timeline({ delay: 0.5, onComplete: startHeroIdleAnimations })
         .from('.landing-geo',          { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' })
