@@ -13,7 +13,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing hero, Pricing, Kids Courses, Adult Courses, Footer |
+| `index.html` | Main page: Landing hero, Pricing, Activities (Kids/Adult Courses), Features, Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles — single shared file |
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
@@ -82,7 +82,7 @@ CDN script order in HTML (order matters):
 
 ### Special Effects
 - **Noise overlay**: SVG fractalNoise on `body::after`, `opacity: 0.08`, fixed, `z-index: 9999`, `pointer-events: none`
-- **Navbar**: `mix-blend-mode: difference` on `<header>` so white text inverts against page content
+- **Navbar**: `mix-blend-mode: difference` on `<header>` so white text inverts against page content. Links: Index | Pricing | Activities | Features | About. `.nav-meta` (right side) contains both `#nav-datetime` and `.nav-location` in a flex row
 - **Link hover**: blue `clip-path` fill slides up from bottom + scramble text effect (JS)
 - **`body` uses `overflow-x: clip`** (not `hidden`) — prevents horizontal scroll without creating a scroll container that would clip child `overflow: visible` (e.g. SVG animations)
 
@@ -146,10 +146,11 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - ScrollTrigger `start: "top 85%"`, `toggleActions: "play none none none"`
 - **Initialized inside `initPreloader` callback** — not at DOMContentLoaded
 
-### 6. Pricing Section Header Cinematic Reveal
-- `#pricing-section-header` (`h2` containing `₹$€£¥`) is split with **SplitType** into `.chars`
-- Each char: blurs in (`blur(20px) → 0`) on scroll-in, then flickers blue (`#0000CD` glow) and resolves to `color: inherit`
-- Random per-char delay (up to 0.4s × `Math.random()`), `toggleActions: "play none none reset"`
+### 6. Section Header Cinematic Reveal (`cinematicCharReveal`)
+- Applied to `#pricing-section-header`, `#activities-section-header`, and `#features-section-header`
+- Each `h2` is split with **SplitType** into `.chars`
+- Each char: blurs in (`blur(20px) → 0`) on scroll-in, then flickers green (`#39FF14` glow) and resolves to `color: inherit`
+- Random per-char delay (up to 0.4s × `Math.random()`), `toggleActions: "play none none reverse"`
 - Skipped if `prefers-reduced-motion` or SplitType not loaded
 
 ### 7. Day Pass Price Flash Animation
@@ -195,7 +196,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 **Day Passes**: Boulder Pass 900 | Full Experience (+ shoes + belay) 1100  
 **Memberships w/ Shoes**: 1M 9000 | 3M 22000 | 6M 32000 | Annual 52000  
 **Memberships w/o Shoes**: 1M 7000 | 3M 17000 | 6M 27000 | Annual 37000  
-**Kids Courses**: Ages 6-8 → Mon 5-6:30pm, 6 weeks, NPR 11000 | Ages 8-16 → Tue 4-6pm, 6 weeks, NPR 14000  
+**Kids Courses**: Ages 6-8 → Mon 5-6:30pm, 6 weeks, NPR 11000 | Ages 9-12 → Tue 4-6pm, 6 weeks, NPR 14000 | Ages 13-16 → Tue 4-6pm, 6 weeks, NPR 14000  
 **Adult Courses**: Fundamentals / Women's Bouldering / Lead Climbing  
 *All prices include VAT. Students/kids get 15% discount.*
 
@@ -205,7 +206,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 To minimize token usage when asking Claude for help:
 - Say **which file** you're modifying: `index.html`, `styles.css`, or `main.js`
-- Say **which section** by ID: `#landing`, `#pricing`, `#kids`, `#adult`, `#contact`
+- Say **which section** by ID: `#landing`, `#pricing`, `#activities`, `#features`, `#kids`, `#adult`, `#contact`
 - Say **which JS function** by name, e.g. "in `initSquareGrid`"
 - For CSS, reference the class name from the table above rather than describing it
 - For new features, say "add to `main.js` inside `DOMContentLoaded`"

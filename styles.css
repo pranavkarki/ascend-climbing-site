@@ -174,7 +174,26 @@ section {
     padding-bottom: 2.5rem;
 }
 
+#activities-section-header {
+    padding-bottom: 2.5rem;
+}
+
+#activities {
+    padding-top: 4rem;
+}
+
+
+
 .pricing-label {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: #39ff14;
+    letter-spacing: 0.1em;
+    vertical-align: baseline;
+}
+
+.activities-label,
+.features-label {
     font-family: var(--font-mono);
     font-weight: 400;
     color: #39ff14;
@@ -245,11 +264,6 @@ section.no-pad {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 7rem;
-    position: sticky;
-    top: 0;
-    align-self: flex-start;
-    z-index: 10;
 }
 
 .grid-row.full-bleed>.col-2 {
@@ -324,15 +338,15 @@ header {
 .nav-meta {
     position: absolute;
     top: 50%;
-    left: 66.666vw;
-    transform: translate(-50%, -50%);
+    right: 1.1rem;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .nav-location {
-    position: absolute;
-    top: 50%;
-    right: 1.1rem;
-    transform: translateY(-50%);
+    position: static;
 }
 
 
@@ -905,6 +919,18 @@ footer#contact {
     .pricing-pass-card {
         border-top: var(--line-thickness) solid var(--line-color);
         padding: 1.5rem 0;
+    }
+
+    /* Course cards: stack all three columns full-width with divider lines */
+    .course-cards-row {
+        padding: 0;
+        gap: 0;
+    }
+
+    .course-cards-row .col-1,
+    .course-cards-row .col-2,
+    .course-cards-row .col-3 {
+        grid-column: 1;
     }
 
     .pass-price {

@@ -27,15 +27,15 @@
             <a href="index.html" class="nav-brand">Ascend Climbing</a>
             <nav class="nav-links">
                 <a href="index.html">Index</a>
-                <a href="cafe.html">Cafe</a>
                 <a href="#pricing">Pricing</a>
-                <a href="#kids">Activities</a>
+                <a href="#activities">Activities</a>
+                <a href="#features">Features</a>
                 <a href="#about">About</a>
             </nav>
             <div class="nav-meta">
                 <time id="nav-datetime" class="nav-datetime" datetime=""></time>
+                <span class="nav-location">Lalitpur, Nepal</span>
             </div>
-            <span class="nav-location">Lalitpur, Nepal</span>
         </div>
     </header>
 
@@ -182,57 +182,77 @@
             </div>
         </section>
 
-        <!-- Kids Courses Section -->
-        <section id="kids" class="no-pad sticky-card">
-            <div class="grid-row full-bleed no-border scroll-section">
-                <div class="text-bg-cover"></div>
-                <div class="col-1 animate-up delay-1">
-                    <h2 class="title-underline">Kids Courses</h2>
+        <!-- Activities Section -->
+        <section id="activities">
+            <!-- Activities Section Header -->
+            <div class="grid-row heading-row scroll-section">
+                <div class="section-heading">
+                    <h2 id="activities-section-header">Activities <span class="activities-label">[COURSES/TRIPS]</span></h2>
                 </div>
-                <div class="col-2 flex-col push-right animate-up delay-2">
-                    <div class="course-block mb-2">
-                        <h3>Ages 6 to 8—</h3>
-                        <p>Mondays 5p-6.30p for 6 weeks</p>
-                        <p class="pt-1">NPR 11000</p>
-                    </div>
-                    <div class="course-block">
-                        <h3>Ages 8-16—</h3>
-                        <p>Tuesdays 4p-6p for 6 weeks</p>
-                        <p class="pt-1">NPR 14000</p>
-                    </div>
+            </div>
+
+            <!-- Kids Courses -->
+            <div id="kids" class="grid-row heading-row day-passes-heading-row scroll-section">
+                <div class="section-heading animate-up">
+                    <h3>Kids Courses</h3>
                 </div>
-                <div class="col-3 img-reveal-container">
-                    <img src="ref/kids_image.png" alt="Kids Courses" class="full-height-img img-card">
+            </div>
+            <div class="grid-row course-cards-row scroll-section">
+                <div class="col-1 flex-col pricing-pass-card animate-up">
+                    <h3>Ages 6 to 8—</h3>
+                    <p>Mon 5p–6:30p for 6 weeks</p>
+                    <p class="pass-price">NPR 11000</p>
+                </div>
+                <div class="col-2 flex-col pricing-pass-card animate-up delay-1">
+                    <h3>Ages 9 to 12—</h3>
+                    <p>Tue 4p–6p for 6 weeks</p>
+                    <p class="pass-price">NPR 14000</p>
+                </div>
+                <div class="col-3 flex-col pricing-pass-card animate-up delay-2">
+                    <h3>Ages 13 to 16—</h3>
+                    <p>Tue 4p–6p for 6 weeks</p>
+                    <p class="pass-price">NPR 14000</p>
+                </div>
+            </div>
+
+            <!-- Adult Courses -->
+            <div id="adult" class="grid-row heading-row day-passes-heading-row scroll-section">
+                <div class="section-heading animate-up">
+                    <h3>Adult Courses</h3>
+                </div>
+            </div>
+            <div class="grid-row course-cards-row scroll-section">
+                <div class="col-1 flex-col pricing-pass-card animate-up">
+                    <h3>Adult Fundamentals—</h3>
+                    <p>Mon 5p–6:30p for 6 weeks</p>
+                    <p class="pass-price">NPR 11000</p>
+                </div>
+                <div class="col-2 flex-col pricing-pass-card animate-up delay-1">
+                    <h3>Women's Bouldering—</h3>
+                    <p>Tue 4p–6p for 6 weeks</p>
+                    <p class="pass-price">NPR 14000</p>
+                </div>
+                <div class="col-3 flex-col pricing-pass-card animate-up delay-2">
+                    <h3>Lead Climbing—</h3>
+                    <p>Tue 4p–6p for 6 weeks</p>
+                    <p class="pass-price">NPR 14000</p>
+                </div>
+            </div>
+
+            <!-- Activities Footer Note -->
+            <div class="grid-row note-row no-border scroll-section">
+                <div class="col-1"></div>
+                <div class="col-2 animate-up" style="grid-column: span 2;">
+                    <p>*all prices are inclusive of VAT, Students and kids get 15% discount.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Adult Courses Section -->
-        <section id="adult" class="no-pad sticky-card">
-            <div class="grid-row full-bleed no-border scroll-section">
-                <div class="text-bg-cover"></div>
-                <div class="col-1 animate-up delay-1">
-                    <h2 class="title-underline">Adult Courses</h2>
-                </div>
-                <div class="col-2 flex-col push-right animate-up delay-2">
-                    <div class="course-block mb-2">
-                        <h3>Adult Fundamentals</h3>
-                        <p>Mondays 5p-6.30p for 6 weeks</p>
-                        <p class="pt-1">NPR 11000</p>
-                    </div>
-                    <div class="course-block mb-2">
-                        <h3>Women's Bouldering</h3>
-                        <p>Tuesdays 4p-6p for 6 weeks</p>
-                        <p class="pt-1">NPR 14000</p>
-                    </div>
-                    <div class="course-block">
-                        <h3>Lead Climbing</h3>
-                        <p>Tuesdays 4p-6p for 6 weeks</p>
-                        <p class="pt-1">NPR 14000</p>
-                    </div>
-                </div>
-                <div class="col-3 img-reveal-container">
-                    <img src="ref/adult_image.png" alt="Adult Courses" class="full-height-img img-card">
+        <!-- Features Section -->
+        <section id="features">
+            <div class="grid-row heading-row scroll-section">
+                <div class="section-heading">
+                    <h2 id="features-section-header">Features <span class="features-label">[FEATURES]</span></h2>
                 </div>
             </div>
         </section>

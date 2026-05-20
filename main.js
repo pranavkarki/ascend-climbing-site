@@ -168,22 +168,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Cinematic character reveal — Pricing section header (Daniel Korr style)
-    (function () {
-        const h2 = document.getElementById('pricing-section-header');
-        if (!h2 || typeof SplitType === 'undefined') return;
+    // Cinematic character reveal — shared logic
+    function cinematicCharReveal(el) {
+        if (!el || typeof SplitType === 'undefined') return;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-        const split = new SplitType(h2, { types: 'chars' });
+        const split = new SplitType(el, { types: 'chars' });
         const flashColor = '#39FF14';
 
         split.chars.forEach(char => {
             gsap.timeline({
                 scrollTrigger: {
-                    trigger: h2,
+                    trigger: el,
                     start: 'top 85%',
                     toggleActions: 'play none none reverse',
-                    id: 'flicker',
                 }
             })
             .fromTo(char,
@@ -194,7 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .to(char, { opacity: 1,   color: flashColor, textShadow: `0 0 40px ${flashColor}`, duration: 0.05 })
             .to(char, { opacity: 1,   color: 'inherit',  textShadow: 'none',                   duration: 0.1 });
         });
-    })();
+    }
+
+    // Cinematic character reveal — Pricing and Activities section headers
+    cinematicCharReveal(document.getElementById('pricing-section-header'));
+    cinematicCharReveal(document.getElementById('activities-section-header'));
+    cinematicCharReveal(document.getElementById('features-section-header'));
 
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
