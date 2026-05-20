@@ -322,6 +322,22 @@ document.addEventListener('DOMContentLoaded', () => {
         navItems.forEach(link => {
             link.addEventListener('click', () => { if (menuOpen) closeMenu(); });
         });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 992) {
+                menuOpen = false;
+                killActive();
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('mobile-active');
+                document.body.classList.remove('menu-open');
+                gsap.set(navLinks, { clearProps: 'clip-path,pointer-events,opacity' });
+                navItems.forEach(el => {
+                    const original = el.getAttribute('data-original-text');
+                    if (original) el.innerText = original;
+                    gsap.set(el, { clearProps: 'opacity' });
+                });
+            }
+        });
     }
 
     function startHeroIdleAnimations() {
