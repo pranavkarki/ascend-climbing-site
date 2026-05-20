@@ -48,21 +48,21 @@
         <!-- Landing Section -->
         <section id="landing">
             <div class="landing-inner">
-                <svg class="landing-geo" viewBox="0 0 210 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <svg class="landing-geo" viewBox="0 0 210 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="overflow: visible;">
                     <!-- Row 1: circles touch, triangles same height (50) with narrowing widths -->
                     <circle cx="25" cy="25" r="25"/>
-                    <circle cx="75" cy="25" r="25"/>
-                    <polygon points="100,0 100,50 146,25"/>
-                    <polygon points="146,0 146,50 176,25"/>
-                    <polygon points="176,0 176,50 194,25"/>
-                    <polygon points="194,0 194,50 205,25"/>
+                    <circle id="geo-circle-tr" cx="75" cy="25" r="25"/>
+                    <polygon points="100,0 100,50 143,25"/>
+                    <polygon points="143,0 143,50 173,25"/>
+                    <polygon points="173,0 173,50 191,25"/>
+                    <polygon points="191,0 191,50 202,25"/>
                     <!-- Row 2: same, touching row 1 at y=50 -->
                     <circle cx="25" cy="75" r="25"/>
                     <circle cx="75" cy="75" r="25"/>
-                    <polygon points="100,50 100,100 146,75"/>
-                    <polygon points="146,50 146,100 176,75"/>
-                    <polygon points="176,50 176,100 194,75"/>
-                    <polygon points="194,50 194,100 205,75"/>
+                    <polygon id="geo-tri-a" points="100,50 100,100 143,75"/>
+                    <polygon points="143,50 143,100 173,75"/>
+                    <polygon points="173,50 173,100 191,75"/>
+                    <polygon points="191,50 191,100 202,75"/>
                 </svg>
                 <h1 class="landing-brand">ASCEND.</h1>
                 <p class="landing-climbing-sub">Climbing and Bouldering</p>
@@ -75,11 +75,11 @@
             <!-- Pricing Section Header -->
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading">
-                    <h2 id="pricing-section-header" class="pricing-section-header">₹$€£¥</h2>
+                    <h2 id="pricing-section-header" class="pricing-section-header">₹$€£¥ <span class="pricing-label">[PRICING]</span></h2>
                 </div>
             </div>
             <!-- Day Passes Row -->
-            <div class="grid-row heading-row scroll-section">
+            <div class="grid-row heading-row day-passes-heading-row scroll-section">
                 <div class="section-heading">
                     <h3 id="day-passes-heading">Day Passes</h3>
                 </div>
@@ -156,19 +156,19 @@
             <!-- Perks Row -->
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading animate-up">
-                    <h2>Perks</h2>
+                    <h3>Perks</h3>
                 </div>
             </div>
             <div class="grid-row scroll-section">
                 <div class="col-2 animate-up">
                     <ul class="perks-list">
-                        <li>—Discounted belay service [100]</li>
-                        <li>—Chalk at member rate [50]</li>
-                        <li>—Free rental gear</li>
-                        <li>—Shower and locker access</li>
-                        <li>—Discount on all climbing passes</li>
-                        <li>—Guest passes each month</li>
-                        <li>—Competition discounts</li>
+                        <li>Discounted belay service [100]</li>
+                        <li>Chalk at member rate [50]</li>
+                        <li>Free rental gear</li>
+                        <li>Shower and locker access</li>
+                        <li>Discount on all climbing passes</li>
+                        <li>Guest passes each month</li>
+                        <li>Competition discounts</li>
                     </ul>
                 </div>
             </div>

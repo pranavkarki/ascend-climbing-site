@@ -27,6 +27,11 @@
     box-sizing: border-box;
 }
 
+button:focus,
+button:focus-visible {
+    outline: none;
+}
+
 html {
     scroll-behavior: auto;
 }
@@ -37,7 +42,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.4;
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
     position: relative;
@@ -159,6 +164,22 @@ section {
 
 #pricing {
     padding-top: 4rem;
+}
+
+.day-passes-heading-row {
+    padding-top: 4rem;
+}
+
+#pricing-section-header {
+    padding-bottom: 2.5rem;
+}
+
+.pricing-label {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: #39ff14;
+    letter-spacing: 0.1em;
+    vertical-align: baseline;
 }
 
 section.no-pad {
@@ -296,6 +317,8 @@ header {
     gap: 1.5rem;
     justify-content: center;
     margin: 0;
+    clip-path: none;
+    pointer-events: auto;
 }
 
 .nav-meta {
@@ -375,6 +398,8 @@ header.scrolled .nav-brand:hover {
     padding: 0;
     margin-left: 1rem;
     z-index: 2000;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .menu-toggle span {
@@ -423,6 +448,7 @@ header.scrolled .nav-brand:hover {
     z-index: 0;
 }
 
+
 #landing > * {
     position: relative;
     z-index: 1;
@@ -439,6 +465,7 @@ header.scrolled .nav-brand:hover {
     width: clamp(90px, 23vw, 190px);
     color: var(--text-color);
     margin-bottom: 0.75rem;
+    overflow: visible;
 }
 
 .landing-brand {
@@ -452,6 +479,7 @@ header.scrolled .nav-brand:hover {
     margin: 0;
     text-align: center;
 }
+
 
 .landing-climbing-sub {
     font-size: 24px;
@@ -472,6 +500,7 @@ header.scrolled .nav-brand:hover {
     margin: 0;
     margin-top: 1.5rem;
     text-align: center;
+    width: 100%;
 }
 
 .landing-subtitle {
@@ -519,7 +548,7 @@ header.scrolled .nav-brand:hover {
     font-size: 24px;
     font-weight: 600;
     margin-top: auto;
-    padding-top: 2rem;
+    padding-top: 0.75rem;
 }
 
 /* Membership Tables */
@@ -674,11 +703,11 @@ footer#contact {
     }
 
     .nav-links {
-        display: none;
-        /* Hide regular links */
+        display: flex;
         position: fixed;
         top: 0;
         left: 0;
+        transform: none;
         width: 100%;
         height: 100vh;
         background-color: var(--bg-color);
@@ -688,13 +717,12 @@ footer#contact {
         gap: 2rem;
         z-index: 1500;
         font-size: 1.25rem;
+        clip-path: inset(100% 0% 0% 0%);
+        pointer-events: none;
     }
 
     .nav-links.mobile-active {
-        display: flex;
-        left: 0;
-        transform: none;
-        top: 0;
+        pointer-events: auto;
     }
 
 
@@ -705,8 +733,8 @@ footer#contact {
         right: auto;
         top: auto;
         transform: translateX(-50%);
-        width: 42px;
-        height: 42px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: #FAFAFA;
         border: 1px solid transparent;
@@ -715,7 +743,7 @@ footer#contact {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 7px;
         padding: 0;
         margin: 0;
         transition: background-color 0.25s ease, border-color 0.25s ease;
@@ -723,8 +751,8 @@ footer#contact {
     }
 
     .menu-toggle span {
-        width: 15px;
-        background-color: #171717;
+        width: 18px;
+        background-color: #171717 !important;
     }
 
     .menu-toggle.active {
@@ -733,15 +761,15 @@ footer#contact {
     }
 
     .menu-toggle.active span {
-        background-color: #FAFAFA;
+        background-color: #FAFAFA !important;
     }
 
     .menu-toggle.active span:nth-child(1) {
-        transform: translateY(3.5px) rotate(45deg);
+        transform: translateY(4px) rotate(45deg);
     }
 
     .menu-toggle.active span:nth-child(2) {
-        transform: translateY(-3.5px) rotate(-45deg);
+        transform: translateY(-4px) rotate(-45deg);
     }
 
     .menu-toggle:active {
@@ -913,6 +941,7 @@ footer#contact {
         height: clamp(80px, 18vh, 120px);
     }
 }
+
 
 /* Menu Page Styles */
 #menu-page {

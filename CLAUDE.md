@@ -84,6 +84,7 @@ CDN script order in HTML (order matters):
 - **Noise overlay**: SVG fractalNoise on `body::after`, `opacity: 0.08`, fixed, `z-index: 9999`, `pointer-events: none`
 - **Navbar**: `mix-blend-mode: difference` on `<header>` so white text inverts against page content
 - **Link hover**: blue `clip-path` fill slides up from bottom + scramble text effect (JS)
+- **`body` uses `overflow-x: clip`** (not `hidden`) — prevents horizontal scroll without creating a scroll container that would clip child `overflow: visible` (e.g. SVG animations)
 
 ---
 
@@ -92,10 +93,10 @@ CDN script order in HTML (order matters):
 | Class | Behaviour |
 |-------|-----------|
 | `.landing-inner` | Flex column, centered, `gap: 1rem` — wraps all landing content |
-| `.landing-geo` | Inline SVG geometric mark (2 rows of 2 circles + 4 triangles), `clamp(90px, 23vw, 190px)` wide |
+| `.landing-geo` | Inline SVG geometric mark (2 rows of 2 circles + 4 triangles), `clamp(90px, 23vw, 190px)` wide, `overflow: visible`. First triangle in each row is equilateral (apex at x=143). Triangles chain tip-to-base: 100→143→173→191→202. `#geo-circle-tr` = top-right circle; `#geo-tri-a` = bottom-left triangle (animated) |
 | `.landing-brand` | Primary hero text — Gandur New, weight 300, `clamp(72px, 14vw, 200px)` |
 | `.landing-climbing-sub` | "Climbing and Bouldering" subtitle — uppercase, spaced, 24px |
-| `.landing-tagline` | "The Wall in the South" — 14px, 0.65 opacity |
+| `.landing-tagline` | "The Wall in the South" — 14px, 0.65 opacity, `width: 100%` for correct desktop centering |
 | `.landing-heading` | Legacy class (still in CSS, not used in HTML) |
 | `.scroll-section` | Marks a section for GSAP scroll animation |
 | `.animate-up` | Initial state: `opacity:0; transform:translateY(40px)` — GSAP animates in |
@@ -128,6 +129,12 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 - Header: slides down from `-100%` y + fades in, duration 0.7s, `power3.out`, delay 0.1s
 - `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s
 - Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
+- `onComplete` on the entrance timeline calls `startHeroIdleAnimations()`
+
+### 2a. `startHeroIdleAnimations()` — Hero Idle Animations
+Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`.
+- **Triangle spin** (`#geo-tri-a`, bottom-left triangle): 360° rotation, `power2.inOut`, 1.1s, `svgOrigin: '114 75'` (centroid), repeats every 7–12s after a 1.5s initial delay
+- **Circle bounce** (`#geo-circle-tr`, top-right circle): bounces up 12px (`power2.out` up, `bounce.out` down), repeats every 5–9s after a 2.5s initial delay
 
 ### 3. `updateNavDateTime()` — Live Clock
 - Updates `#nav-datetime` every second

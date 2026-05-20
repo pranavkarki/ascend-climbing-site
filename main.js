@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ease: 'power3.out', stagger: 0.15,
                     scrollTrigger: {
                         trigger: section,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reset'
+                        start: 'top 80%',
+                        toggleActions: 'play none none reverse'
                     }
                 }
             );
@@ -52,17 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 stagger: 0.07,
                 scrollTrigger: {
                     trigger: membershipRow,
-                    start: 'top 85%',
-                    toggleActions: 'play none none reset'
+                    start: 'top 60%',
+                    toggleActions: 'play none none reverse'
                 }
             }
         );
     }
 
-    // Day pass prices: flash blue then settle to white on scroll-in
+    // Day pass prices: flash neon green then settle to white on scroll-in
     document.querySelectorAll('.pass-price').forEach((el, i) => {
         gsap.fromTo(el,
-            { color: '#0000CD', immediateRender: false },
+            { color: '#39FF14', immediateRender: false },
             {
                 color: '#FAFAFA',
                 duration: 0.7,
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.from(header, { yPercent: -100, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform' });
     gsap.from('.menu-toggle', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.8 });
 
-    gsap.timeline({ delay: 0.5 })
+    gsap.timeline({ delay: 0.5, onComplete: startHeroIdleAnimations })
         .from('.landing-geo',          { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' })
         .from('.landing-brand',        { y: 50, opacity: 0, duration: 0.9, ease: 'power3.out' }, '-=0.3')
         .from('.landing-climbing-sub', { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
@@ -175,14 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
         const split = new SplitType(h2, { types: 'chars' });
-        const flashColor = '#0000CD';
+        const flashColor = '#39FF14';
 
         split.chars.forEach(char => {
             gsap.timeline({
                 scrollTrigger: {
                     trigger: h2,
                     start: 'top 85%',
-                    toggleActions: 'play none none reset',
+                    toggleActions: 'play none none reverse',
                     id: 'flicker',
                 }
             })
@@ -199,17 +199,152 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
     if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('mobile-active');
-            document.body.classList.toggle('menu-open');
+        const navItems = Array.from(navLinks.querySelectorAll('a'));
+        let menuOpen = false;
+        let activeTweens = [];
+
+        navItems.forEach(el => {
+            if (!el.hasAttribute('data-original-text')) {
+                el.setAttribute('data-original-text', el.innerText);
+            }
         });
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('mobile-active');
-                document.body.classList.remove('menu-open');
+
+        function killActive() {
+            activeTweens.forEach(t => t.kill());
+            activeTweens = [];
+        }
+
+        function scrambleIn(el, delay) {
+            const original = el.getAttribute('data-original-text');
+            const obj = { value: 0 };
+            let frames = 0;
+            let scrambled = [];
+            gsap.set(el, { opacity: 1 });
+            return gsap.to(obj, {
+                value: original.length,
+                duration: 0.6,
+                ease: 'power2.out',
+                delay,
+                onUpdate() {
+                    const progress = Math.floor(obj.value);
+                    let str = '';
+                    for (let i = 0; i < original.length; i++) {
+                        if (i < progress) {
+                            str += original[i];
+                        } else if (original[i] === ' ') {
+                            str += ' ';
+                        } else {
+                            if (frames % 3 === 0 || !scrambled[i]) scrambled[i] = scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                            str += scrambled[i];
+                        }
+                    }
+                    el.innerText = str;
+                    frames++;
+                },
+                onComplete() { el.innerText = original; }
             });
+        }
+
+        function scrambleOut(el, delay) {
+            const original = el.getAttribute('data-original-text');
+            const obj = { value: original.length };
+            let frames = 0;
+            let scrambled = [];
+            return gsap.to(obj, {
+                value: 0,
+                duration: 0.35,
+                ease: 'power2.in',
+                delay,
+                onUpdate() {
+                    const progress = Math.floor(obj.value);
+                    let str = '';
+                    for (let i = 0; i < original.length; i++) {
+                        if (i < progress) {
+                            str += original[i];
+                        } else if (original[i] === ' ') {
+                            str += ' ';
+                        } else {
+                            if (frames % 3 === 0 || !scrambled[i]) scrambled[i] = scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                            str += scrambled[i];
+                        }
+                    }
+                    el.innerText = str;
+                    frames++;
+                },
+                onComplete() { el.innerText = ''; }
+            });
+        }
+
+        function openMenu() {
+            menuOpen = true;
+            killActive();
+            menuToggle.classList.add('active');
+            navLinks.classList.add('mobile-active');
+            document.body.classList.add('menu-open');
+            gsap.set(navItems, { opacity: 1 });
+
+            activeTweens.push(gsap.to(navLinks, {
+                clipPath: 'inset(0% 0% 0% 0%)',
+                duration: 0.5,
+                ease: 'power3.out'
+            }));
+            navItems.forEach((el, i) => {
+                activeTweens.push(scrambleIn(el, i * 0.08));
+            });
+        }
+
+        function closeMenu() {
+            menuOpen = false;
+            menuToggle.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            killActive();
+
+            navItems.forEach((el, i) => {
+                activeTweens.push(scrambleOut(el, i * 0.05));
+            });
+
+            const closeDelay = (navItems.length - 1) * 0.05 + 0.35;
+            activeTweens.push(gsap.to(navLinks, {
+                clipPath: 'inset(100% 0% 0% 0%)',
+                duration: 0.5,
+                ease: 'power3.in',
+                delay: closeDelay,
+                onComplete: () => navLinks.classList.remove('mobile-active')
+            }));
+        }
+
+        menuToggle.addEventListener('click', () => {
+            if (menuOpen) closeMenu(); else openMenu();
         });
+        navItems.forEach(link => {
+            link.addEventListener('click', () => { if (menuOpen) closeMenu(); });
+        });
+    }
+
+    function startHeroIdleAnimations() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        // --- SVG triangle periodic rotation (bottom-left triangle only) ---
+        const triA = document.getElementById('geo-tri-a');
+        if (triA) {
+            gsap.delayedCall(1.5, function spin() {
+                gsap.timeline()
+                    .to(triA, { rotation: 360, duration: 1.1, ease: 'power2.inOut', svgOrigin: '114 75' })
+                    .set(triA, { rotation: 0 })
+                    .call(() => gsap.delayedCall(7 + Math.random() * 5, spin));
+            });
+        }
+
+        // --- Top-right circle periodic bounce ---
+        const circTR = document.getElementById('geo-circle-tr');
+        function bounceCir() {
+            if (!circTR) return;
+            gsap.timeline()
+                .to(circTR, { y: -12, duration: 0.22, ease: 'power2.out' })
+                .to(circTR, { y: 0,   duration: 0.5,  ease: 'bounce.out' })
+                .call(() => gsap.delayedCall(5 + Math.random() * 4, bounceCir));
+        }
+        gsap.delayedCall(2.5, bounceCir);
+
     }
 });
