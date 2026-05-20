@@ -119,7 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    gsap.from(header, { opacity: 0, duration: 1.4, ease: 'power2.out', delay: 0.2 });
+    gsap.from(header, { yPercent: -100, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform' });
+    gsap.from('.menu-toggle', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.8 });
+
+    gsap.timeline({ delay: 0.5 })
+        .from('.landing-geo',          { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' })
+        .from('.landing-brand',        { y: 50, opacity: 0, duration: 0.9, ease: 'power3.out' }, '-=0.3')
+        .from('.landing-climbing-sub', { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+        .from('.landing-tagline',      { y: 15, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3');
 
     const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
     document.querySelectorAll('a').forEach(link => {
@@ -160,6 +167,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    // Cinematic character reveal — Pricing section header (Daniel Korr style)
+    (function () {
+        const h2 = document.getElementById('pricing-section-header');
+        if (!h2 || typeof SplitType === 'undefined') return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const split = new SplitType(h2, { types: 'chars' });
+        const flashColor = '#0000CD';
+
+        split.chars.forEach(char => {
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: h2,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reset',
+                    id: 'flicker',
+                }
+            })
+            .fromTo(char,
+                { opacity: 0, y: 10, filter: 'blur(20px)' },
+                { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.4, ease: 'power2.out', delay: 0.4 * Math.random() }
+            )
+            .to(char, { opacity: 0.1, color: flashColor, textShadow: `0 0 10px ${flashColor}`, duration: 0.03 })
+            .to(char, { opacity: 1,   color: flashColor, textShadow: `0 0 40px ${flashColor}`, duration: 0.05 })
+            .to(char, { opacity: 1,   color: 'inherit',  textShadow: 'none',                   duration: 0.1 });
+        });
+    })();
 
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');

@@ -14,7 +14,8 @@
     <title>Climbing Gym in Jhamsikhel, Lalitpur - Ascend Climbing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="preload" href="fonts/Gandur New-Light.otf" as="font" type="font/otf" crossorigin>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -35,23 +36,52 @@
                 <time id="nav-datetime" class="nav-datetime" datetime=""></time>
             </div>
             <span class="nav-location">Lalitpur, Nepal</span>
-            <button class="menu-toggle" aria-label="Toggle Menu">
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </header>
 
+    <button class="menu-toggle" aria-label="Toggle Menu">
+        <span></span>
+        <span></span>
+    </button>
+
     <main class="grid-container">
         <!-- Landing Section -->
-        <section id="landing"></section>
+        <section id="landing">
+            <div class="landing-inner">
+                <svg class="landing-geo" viewBox="0 0 210 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Row 1: circles touch, triangles same height (50) with narrowing widths -->
+                    <circle cx="25" cy="25" r="25"/>
+                    <circle cx="75" cy="25" r="25"/>
+                    <polygon points="100,0 100,50 146,25"/>
+                    <polygon points="146,0 146,50 176,25"/>
+                    <polygon points="176,0 176,50 194,25"/>
+                    <polygon points="194,0 194,50 205,25"/>
+                    <!-- Row 2: same, touching row 1 at y=50 -->
+                    <circle cx="25" cy="75" r="25"/>
+                    <circle cx="75" cy="75" r="25"/>
+                    <polygon points="100,50 100,100 146,75"/>
+                    <polygon points="146,50 146,100 176,75"/>
+                    <polygon points="176,50 176,100 194,75"/>
+                    <polygon points="194,50 194,100 205,75"/>
+                </svg>
+                <h1 class="landing-brand">ASCEND.</h1>
+                <p class="landing-climbing-sub">Climbing and Bouldering</p>
+                <p class="landing-tagline">The Wall in the South</p>
+            </div>
+        </section>
 
         <!-- Pricing Section -->
         <section id="pricing">
+            <!-- Pricing Section Header -->
+            <div class="grid-row heading-row scroll-section">
+                <div class="section-heading">
+                    <h2 id="pricing-section-header" class="pricing-section-header">₹$€£¥</h2>
+                </div>
+            </div>
             <!-- Day Passes Row -->
             <div class="grid-row heading-row scroll-section">
-                <div class="section-heading animate-up">
-                    <h2>Day Passes</h2>
+                <div class="section-heading">
+                    <h3 id="day-passes-heading">Day Passes</h3>
                 </div>
             </div>
             <div class="grid-row pricing-passes-row scroll-section">
@@ -70,7 +100,7 @@
             <!-- Memberships Row -->
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading animate-up">
-                    <h2>Memberships</h2>
+                    <h3>Memberships</h3>
                 </div>
             </div>
             <div class="grid-row pricing-membership-row scroll-section">
@@ -219,6 +249,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
     <script src="main.js"></script>
 </body>
 

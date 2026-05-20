@@ -19,6 +19,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
 | `img/square/` | 9 square climbing photos for fullscreen preloader roulette |
 | `img/` | Larger gym photos (JPG/WEBP) |
+| `fonts/` | Local font files — `Gandur New-Light.otf` |
 | `ref/` | Course images (`kids_image.png`, `adult_image.png`), logo, reference screenshots |
 | `vercel.json` | `{ "cleanUrls": true }` |
 
@@ -28,7 +29,10 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
 - **Lenis 1.1.14** — smooth scroll, loaded via CDN before GSAP. `lerp: 0.1`
 - **GSAP 3.12.5** + **ScrollTrigger** — loaded via CDN at bottom of `<body>`
-- **Inconsolata** (Google Fonts, 400 weight) — only font used
+- **Split Type 0.3.4** — character/word splitting for cinematic text reveals, loaded via CDN
+- **Inconsolata** (Google Fonts, 400 weight) — body text
+- **Bebas Neue** (Google Fonts) — fallback display font
+- **Gandur New** (local, `fonts/Gandur New-Light.otf`, weight 300) — primary landing brand heading
 - No framework, no Tailwind (yet)
 
 CDN script order in HTML (order matters):
@@ -36,6 +40,7 @@ CDN script order in HTML (order matters):
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
 <script src="main.js"></script>
 ```
 
@@ -65,10 +70,15 @@ CDN script order in HTML (order matters):
 - `.grid-row.no-border` → suppresses row border
 
 ### Typography
-- `h1`: 128px, weight 500, uppercase, line-height 1
+- `h1` (standard): 128px, weight 500, uppercase, line-height 1
+- `.landing-brand`: Gandur New (fallback Bebas Neue), weight 300, `clamp(72px, 14vw, 200px)`, line-height 0.88, white — primary landing hero text
+- `.landing-climbing-sub`: Inconsolata, 24px (16px mobile), weight 600, uppercase, letter-spacing 0.35em
+- `.landing-tagline`: Inconsolata, 14px, uppercase, letter-spacing 0.2em, opacity 0.65
 - `h2`: 96px, weight 700, uppercase
 - `h3`: 24px, weight 600
 - Body/p/span/li/a: 14px, weight 400
+
+> Note: `.landing-heading` class still exists in CSS but is no longer used in the HTML — replaced by `.landing-brand`.
 
 ### Special Effects
 - **Noise overlay**: SVG fractalNoise on `body::after`, `opacity: 0.08`, fixed, `z-index: 9999`, `pointer-events: none`
@@ -81,6 +91,12 @@ CDN script order in HTML (order matters):
 
 | Class | Behaviour |
 |-------|-----------|
+| `.landing-inner` | Flex column, centered, `gap: 1rem` — wraps all landing content |
+| `.landing-geo` | Inline SVG geometric mark (2 rows of 2 circles + 4 triangles), `clamp(90px, 23vw, 190px)` wide |
+| `.landing-brand` | Primary hero text — Gandur New, weight 300, `clamp(72px, 14vw, 200px)` |
+| `.landing-climbing-sub` | "Climbing and Bouldering" subtitle — uppercase, spaced, 24px |
+| `.landing-tagline` | "The Wall in the South" — 14px, 0.65 opacity |
+| `.landing-heading` | Legacy class (still in CSS, not used in HTML) |
 | `.scroll-section` | Marks a section for GSAP scroll animation |
 | `.animate-up` | Initial state: `opacity:0; transform:translateY(40px)` — GSAP animates in |
 | `.delay-1`, `.delay-2` | Used with GSAP stagger (0.15s per step) |
@@ -91,7 +107,7 @@ CDN script order in HTML (order matters):
 | `.push-right` | `padding-left: 15%` — nudges col-2 content toward image |
 | `.flex-col` | `display:flex; flex-direction:column` |
 | `.mt-auto`, `.mb-2`, `.pt-1`, `.pt-2` | Spacing utilities |
-| `.menu-toggle` | Hamburger button (hidden on desktop, shown at ≤992px) |
+| `.menu-toggle` | Hamburger button — **direct child of `<body>`**, not inside `<header>`; fixed position on mobile (≤992px), `z-index: 2000` |
 | `.mobile-active` | Added to `.nav-links` when hamburger is open |
 
 ---
@@ -108,36 +124,47 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 - Respects `prefers-reduced-motion` (skips roulette, wipes immediately)
 - No hover effects; images shown in full color (no grayscale filter)
 
-### 2. `updateNavDateTime()` — Live Clock
+### 2. Header & Landing Entrance Animations
+- Header: slides down from `-100%` y + fades in, duration 0.7s, `power3.out`, delay 0.1s
+- `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s
+- Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
+
+### 3. `updateNavDateTime()` — Live Clock
 - Updates `#nav-datetime` every second
 - Timezone: `Asia/Kathmandu`
 
-### 3. Scroll Animations (deferred until after preloader)
+### 4. Scroll Animations (deferred until after preloader)
 - All `.scroll-section` elements: GSAP `fromTo` on nested `.animate-up` children
 - `y: 40 → 0`, `opacity: 0 → 1`, duration 0.8s, ease `power3.out`, stagger 0.15s
 - ScrollTrigger `start: "top 85%"`, `toggleActions: "play none none none"`
 - **Initialized inside `initPreloader` callback** — not at DOMContentLoaded
 
-### 4. Day Pass Price Flash Animation
+### 6. Pricing Section Header Cinematic Reveal
+- `#pricing-section-header` (`h2` containing `₹$€£¥`) is split with **SplitType** into `.chars`
+- Each char: blurs in (`blur(20px) → 0`) on scroll-in, then flickers blue (`#0000CD` glow) and resolves to `color: inherit`
+- Random per-char delay (up to 0.4s × `Math.random()`), `toggleActions: "play none none reset"`
+- Skipped if `prefers-reduced-motion` or SplitType not loaded
+
+### 7. Day Pass Price Flash Animation
 - `.pass-price` elements: GSAP `fromTo` on scroll-in — starts blue (`#0000CD`), transitions to white (`#FAFAFA`)
 - Duration 0.7s, ease `power2.out`, staggered by 0.15s per card
 - Font size: `24px / weight 600` (matches `h3`) on both desktop and mobile
 
-### 5. Image Reveals (deferred until after preloader)
+### 8. Image Reveals (deferred until after preloader)
 - `.img-reveal-container` inside a `.scroll-section`: scrub clip-path from `inset(100% 0% 0% 0%)` → `inset(0%)`
 - Triggered from `top bottom` to `top top` of parent `.scroll-section`
 - **Initialized inside `initPreloader` callback** — not at DOMContentLoaded
 
-### 6. Scramble Text on Hover
+### 9. Scramble Text on Hover
 - Applied to all `<a>` with no child elements
 - Custom GSAP tween cycles random chars, resolving L→R to original text over 0.7s
 - Stores original text in `data-original-text` attribute
 
-### 7. Hamburger Menu
+### 10. Hamburger Menu
 - Toggle `.menu-toggle` adds/removes `.active` (animates spans to X) and `.mobile-active` on `.nav-links`
 - Also toggles `menu-open` on `<body>` (disables `mix-blend-mode: difference` on header)
 
-### 8. Header Height CSS Var
+### 11. Header Height CSS Var
 - `updateHeaderHeight()` sets `--header-height` on `:root` to actual header pixel height
 - Runs on load and `resize`
 

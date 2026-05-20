@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Gandur New';
+    src: url('fonts/Gandur New-Light.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: block;
+}
+
 :root {
     --bg-color: #0e0e0e;
     --text-color: #FAFAFA;
@@ -130,6 +138,23 @@ section {
     flex-direction: column;
     justify-content: center;
     padding: 2rem 0;
+}
+
+#landing {
+    height: calc(100vh - var(--header-height));
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.landing-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 12vw, 180px);
+    font-weight: 400;
+    color: var(--text-color);
+    text-align: center;
+    width: fit-content;
+    white-space: nowrap;
 }
 
 #pricing {
@@ -287,13 +312,6 @@ header {
     transform: translateY(-50%);
 }
 
-.nav-row .menu-toggle {
-    position: absolute;
-    top: 50%;
-    right: 1.1rem;
-    transform: translateY(-50%);
-    margin-left: 0;
-}
 
 .nav-datetime,
 .nav-location {
@@ -382,8 +400,9 @@ header.scrolled .nav-brand:hover {
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: stretch;
-    padding-top: 0;
+    justify-content: center;
+    align-items: center;
+    padding-top: var(--header-height);
     padding-bottom: 0;
     position: relative;
     background-image: url('img/IMG_5281.jpg');
@@ -407,6 +426,52 @@ header.scrolled .nav-brand:hover {
 #landing > * {
     position: relative;
     z-index: 1;
+}
+
+.landing-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.landing-geo {
+    width: clamp(90px, 23vw, 190px);
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.landing-brand {
+    font-family: 'Gandur New', 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 14vw, 200px);
+    font-weight: 300;
+    text-transform: uppercase;
+    line-height: 0.88;
+    letter-spacing: 0.01em;
+    color: var(--text-color);
+    margin: 0;
+    text-align: center;
+}
+
+.landing-climbing-sub {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    color: var(--text-color);
+    margin: 0;
+    text-align: center;
+}
+
+.landing-tagline {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-color);
+    opacity: 0.65;
+    margin: 0;
+    margin-top: 1.5rem;
+    text-align: center;
 }
 
 .landing-subtitle {
@@ -548,6 +613,11 @@ header.scrolled .nav-brand:hover {
     will-change: opacity, transform;
 }
 
+#day-passes-heading .char {
+    will-change: transform, opacity, filter;
+    display: inline-block;
+}
+
 /* Sticky Card Sections */
 .sticky-card {
     position: sticky;
@@ -628,7 +698,7 @@ footer#contact {
     }
 
 
-    .nav-row .menu-toggle {
+    .menu-toggle {
         position: fixed;
         bottom: 1.75rem;
         left: 50%;
@@ -649,31 +719,20 @@ footer#contact {
         padding: 0;
         margin: 0;
         transition: background-color 0.25s ease, border-color 0.25s ease;
+        z-index: 2000;
     }
 
-    header .menu-toggle span,
-    header.scrolled .menu-toggle span {
+    .menu-toggle span {
         width: 15px;
         background-color: #171717;
     }
 
-    .nav-row .menu-toggle:hover {
+    .menu-toggle.active {
         background-color: #0000CD;
         border-color: #FAFAFA;
     }
 
-    header .menu-toggle:hover span,
-    header.scrolled .menu-toggle:hover span {
-        background-color: #FAFAFA;
-    }
-
-    .nav-row .menu-toggle.active {
-        background-color: #0000CD;
-        border-color: #FAFAFA;
-    }
-
-    header .menu-toggle.active span,
-    header.scrolled .menu-toggle.active span {
+    .menu-toggle.active span {
         background-color: #FAFAFA;
     }
 
@@ -685,7 +744,7 @@ footer#contact {
         transform: translateY(-3.5px) rotate(-45deg);
     }
 
-    .nav-row .menu-toggle:active {
+    .menu-toggle:active {
         transform: translateX(-50%) scale(0.9);
     }
 
@@ -744,8 +803,9 @@ footer#contact {
         height: 100dvh;
         display: flex;
         flex-direction: column;
-        justify-content: flex-end;
-        padding-top: 0;
+        justify-content: center;
+        align-items: center;
+        padding-top: var(--header-height);
         padding-bottom: 0;
     }
 
@@ -788,6 +848,11 @@ footer#contact {
     .landing-description {
         max-width: 24ch;
         margin-top: 0;
+    }
+
+    .landing-climbing-sub {
+        font-size: 16px;
+        letter-spacing: 0.25em;
     }
 
     h1 {
