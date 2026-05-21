@@ -1,6 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     gsap.registerPlugin(ScrollTrigger);
 
+    const ST_PLAY_REVERSE = (trigger) => ({ trigger, start: 'top 85%', toggleActions: 'play none none reverse' });
+    const ST_PLAY_RESET   = (trigger) => ({ trigger, start: 'top 85%', toggleActions: 'play none none reset' });
+
+    const ACCENT = '#39FF14';
+    const CONFIG = {
+        SCRAMBLE_CHARS: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+',
+        STAGGER: 0.15,
+        SCROLL_THRESHOLD: 200,
+        MOBILE_BREAKPOINT: 992,
+        TIMEZONE: 'Asia/Kathmandu',
+    };
+
     const lenis = new Lenis({ lerp: 0.1 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => { lenis.raf(time * 1000); });
@@ -13,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { y: 40, opacity: 0 },
                 {
                     y: 0, opacity: 1, duration: 0.8,
-                    ease: 'power3.out', stagger: 0.15,
+                    ease: 'power3.out', stagger: CONFIG.STAGGER,
                     scrollTrigger: {
                         trigger: section,
                         start: 'top 80%',
@@ -22,22 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             );
         }
-    });
-
-    document.querySelectorAll('.img-reveal-container').forEach(reveal => {
-        gsap.fromTo(reveal,
-            { clipPath: 'inset(100% 0% 0% 0%)' },
-            {
-                clipPath: 'inset(0% 0% 0% 0%)',
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: reveal.closest('.scroll-section'),
-                    start: 'top bottom',
-                    end: 'top top',
-                    scrub: true
-                }
-            }
-        );
     });
 
     // Membership rows: clip-path stagger reveal (each row wipes in from bottom)
@@ -63,17 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.scroll-section').forEach(section => {
         section.querySelectorAll('.pass-price').forEach((el, i) => {
             gsap.fromTo(el,
-                { color: '#39FF14', immediateRender: false },
+                { color: ACCENT, immediateRender: false },
                 {
                     color: '#FAFAFA',
                     duration: 0.7,
                     ease: 'power2.out',
                     delay: 0.45 + i * 0.15,
-                    scrollTrigger: {
-                        trigger: section,
-                        start: 'top 85%',
-                        toggleActions: 'play none none reset'
-                    }
+                    scrollTrigger: ST_PLAY_RESET(section)
                 }
             );
         });
@@ -83,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.feature-img-wrap').forEach(wrap => {
         const img = wrap.querySelector('img');
         const trigger = wrap.closest('.feature-item');
-        const scrollTriggerConfig = { trigger, start: 'top 85%', toggleActions: 'play none none reverse' };
+        const scrollTriggerConfig = ST_PLAY_REVERSE(trigger);
 
         if (img) {
             gsap.set(img, { clipPath: 'inset(100% 0% 0% 0%)', filter: 'blur(2px)', scale: 1.03, opacity: 1 });
@@ -103,13 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!el) return;
         const now = new Date();
         const date = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Kathmandu',
+            timeZone: CONFIG.TIMEZONE,
             day: 'numeric',
             month: 'short',
             year: 'numeric',
         }).format(now);
         const time = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Kathmandu',
+            timeZone: CONFIG.TIMEZONE,
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
@@ -120,7 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     updateNavDateTime();
-    setInterval(updateNavDateTime, 1000);
+    let clockInterval;
+    const startClock = () => { clockInterval = setInterval(updateNavDateTime, 1000); };
+    const stopClock  = () => clearInterval(clockInterval);
+    document.addEventListener('visibilitychange', () => document.hidden ? stopClock() : startClock());
+    startClock();
 
     const updateHeaderHeight = () => {
         const header = document.querySelector('header');
@@ -134,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const header = document.querySelector('header');
     const onScroll = () => {
-        const scrolled = window.scrollY > 200;
+        const scrolled = window.scrollY > CONFIG.SCROLL_THRESHOLD;
         header.classList.toggle('scrolled', scrolled);
         document.body.classList.toggle('header-scrolled', scrolled);
     };
@@ -149,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .from('.landing-climbing-sub', { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
         .from('.landing-tagline',      { y: 15, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3');
 
-    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
+    const scrambleChars = CONFIG.SCRAMBLE_CHARS;
     document.querySelectorAll('a').forEach(link => {
         if (link.children.length > 0) return;
         if (!link.hasAttribute('data-original-text')) {
@@ -195,16 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
         const split = new SplitType(el, { types: 'chars' });
-        const flashColor = '#39FF14';
+        const flashColor = ACCENT;
 
         split.chars.forEach(char => {
-            gsap.timeline({
-                scrollTrigger: {
-                    trigger: el,
-                    start: 'top 85%',
-                    toggleActions: 'play none none reverse',
-                }
-            })
+            gsap.timeline({ scrollTrigger: ST_PLAY_REVERSE(el) })
             .fromTo(char,
                 { opacity: 0, y: 10, filter: 'blur(20px)' },
                 { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.4, ease: 'power2.out', delay: 0.4 * Math.random() }
@@ -345,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 992) {
+            if (window.innerWidth > CONFIG.MOBILE_BREAKPOINT) {
                 menuOpen = false;
                 killActive();
                 menuToggle.classList.remove('active');

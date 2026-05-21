@@ -20,6 +20,8 @@
     --line-delay-landing-horizontal: calc(var(--line-delay-vertical) + var(--line-anim-duration));
     --header-height: 72px;
     --gutter: 2vw;
+    --section-pt: 4rem;
+    --color-accent: #39FF14;
 }
 
 * {
@@ -162,22 +164,13 @@ section {
     padding: 0;
 }
 
-.landing-heading {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(64px, 12vw, 180px);
-    font-weight: 400;
-    color: var(--text-color);
-    text-align: center;
-    width: fit-content;
-    white-space: nowrap;
-}
 
 #pricing {
-    padding-top: 4rem;
+    padding-top: var(--section-pt);
 }
 
 .day-passes-heading-row {
-    padding-top: 4rem;
+    padding-top: var(--section-pt);
 }
 
 #pricing-section-header {
@@ -189,11 +182,11 @@ section {
 }
 
 #activities {
-    padding-top: 4rem;
+    padding-top: var(--section-pt);
 }
 
 #features {
-    padding-top: 4rem;
+    padding-top: var(--section-pt);
 }
 
 #features-section-header {
@@ -202,20 +195,10 @@ section {
 
 
 
-.pricing-label {
+.section-label {
     font-family: var(--font-mono);
     font-weight: 400;
-    color: #39ff14;
-    letter-spacing: 0.1em;
-    vertical-align: baseline;
-    margin-left: 1.8em;
-}
-
-.activities-label,
-.features-label {
-    font-family: var(--font-mono);
-    font-weight: 400;
-    color: #39ff14;
+    color: var(--color-accent);
     letter-spacing: 0.1em;
     vertical-align: baseline;
     margin-left: 1.8em;
@@ -526,45 +509,6 @@ header.scrolled .nav-brand:hover {
     width: 100%;
 }
 
-.landing-subtitle {
-    font-size: clamp(0.75rem, 1.3vw, 1rem);
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    margin-bottom: 0.75rem;
-    opacity: 1;
-}
-
-.landing-description {
-    margin-top: 0;
-    max-width: 18ch;
-    line-height: 1.6;
-    font-size: clamp(0.75rem, 1vw, 0.875rem);
-    text-align: justify;
-    text-align-last: left;
-    word-spacing: 0.25em;
-    hyphens: auto;
-}
-
-.landing-row {
-    flex: 1;
-    min-height: 0;
-    align-items: stretch;
-    padding: var(--header-height) var(--gutter) 0;
-}
-
-/* Left: headings sit upper-middle — intentionally off-center */
-.landing-left {
-    justify-content: flex-start;
-    padding-top: 28%;
-}
-
-/* Right: description drifts toward the lower third — deliberate misalignment */
-.landing-right {
-    justify-content: flex-end;
-    padding-bottom: 12%;
-    align-items: flex-start;
-}
 
 /* Day Pass Cards */
 .pass-price {
@@ -623,11 +567,6 @@ header.scrolled .nav-brand:hover {
     padding-top: 0;
 }
 
-/* Courses blocks */
-.course-block {
-    display: flex;
-    flex-direction: column;
-}
 
 /* Images */
 .overflow-hidden {
@@ -643,18 +582,9 @@ header.scrolled .nav-brand:hover {
 }
 
 /* Utilities */
-.push-right {
-    padding-left: 15%;
-    /* Push text closer to the image */
-}
-
 .flex-col {
     display: flex;
     flex-direction: column;
-}
-
-.justify-end {
-    justify-content: flex-end;
 }
 
 .mt-auto {
@@ -673,13 +603,6 @@ header.scrolled .nav-brand:hover {
     padding-top: 2rem;
 }
 
-.flex {
-    display: flex;
-}
-
-.items-center {
-    align-items: center;
-}
 
 /* Animations */
 .scroll-section .animate-up {
@@ -693,19 +616,6 @@ header.scrolled .nav-brand:hover {
     display: inline-block;
 }
 
-/* Sticky Card Sections */
-.sticky-card {
-    position: sticky;
-    top: 0;
-    /* background-color removed to allow right column to be transparent */
-}
-
-/* Image Reveal Container */
-.img-reveal-container {
-    position: relative;
-    overflow: hidden;
-    /* clip-path is applied via JS */
-}
 
 /* Footer Line Extension */
 footer#contact {
@@ -757,7 +667,7 @@ footer#contact {
     font-family: var(--font-mono);
     font-size: 14px;
     font-weight: 400;
-    color: #39ff14;
+    color: var(--color-accent);
     letter-spacing: 0.1em;
     display: block;
     margin-bottom: 0.5rem;
@@ -879,10 +789,6 @@ footer#contact {
     }
 
 
-    .sticky-card {
-        position: relative;
-    }
-
     .text-bg-cover {
         display: none;
     }
@@ -919,10 +825,6 @@ footer#contact {
         min-height: 80vh;
     }
 
-    .push-right {
-        padding-left: 0;
-    }
-
     #landing {
         min-height: 100dvh;
         height: 100dvh;
@@ -937,42 +839,6 @@ footer#contact {
     #pricing {
         padding-top: 2rem;
         /* Reduced for mobile */
-    }
-
-    .landing-description {
-        margin-top: 1rem;
-    }
-
-    .landing-row {
-        grid-template-columns: 1fr !important;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        padding-bottom: 0;
-    }
-
-    #landing .col-2 {
-        display: none;
-    }
-
-    #landing .col-1 {
-        width: 100%;
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding-top: 20%;
-    }
-
-    #landing .col-3 {
-        width: 100%;
-        align-items: flex-start;
-        justify-content: flex-start;
-        padding-top: 1rem;
-    }
-
-    .landing-description {
-        max-width: 24ch;
-        margin-top: 0;
     }
 
     .landing-climbing-sub {
