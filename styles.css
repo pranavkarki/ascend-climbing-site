@@ -41,6 +41,15 @@ body {
     font-family: var(--font-mono);
     font-weight: 400;
     background-color: var(--bg-color);
+    /* Same noise SVG as body::after but with opacity baked into the SVG (rect opacity=0.12).
+       The ::after overlay is position:fixed and gets clamped by iOS Safari to the safe-area-
+       bounded viewport, so it doesn't reach the dynamic island / URL-bar strips. Body's
+       background-image does reach those strips (body extends edge-to-edge under viewport-fit=cover),
+       so when <main> is hidden during menu-open, the safe-area strips show the same dark+noise
+       as the popup interior instead of pure flat #0e0e0e. */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 350px 350px;
     color: var(--text-color);
     line-height: 1.4;
     overflow-x: clip;
@@ -297,7 +306,7 @@ section.no-pad {
 header {
     position: sticky;
     width: 100%;
-    top: 0.75rem;
+    top: calc(0.75rem + env(safe-area-inset-top));
     background-color: transparent;
     z-index: 1000;
     /* Blend against page content — must be on the header itself, not children,
@@ -324,8 +333,11 @@ header {
 }
 
 .nav-links {
-    position: absolute;
-    top: 50%;
+    /* Direct child of <body> (moved out of <header> so position:fixed can escape
+       the sticky parent's box on iOS WebKit). On desktop, position over the nav-row
+       using the header's sticky offset + half the measured header height. */
+    position: fixed;
+    top: calc(0.75rem + env(safe-area-inset-top, 0px) + var(--header-height, 72px) / 2);
     left: 33.333vw;
     transform: translate(-50%, -50%);
     display: flex;
@@ -334,6 +346,7 @@ header {
     margin: 0;
     clip-path: none;
     pointer-events: auto;
+    z-index: 1100;
 }
 
 .nav-meta {
@@ -358,19 +371,19 @@ header {
 }
 
 header .nav-brand,
-header .nav-links a,
+.nav-links a,
 header .nav-datetime,
 header .nav-location {
     color: #fff;
     text-transform: uppercase;
 }
 
-header .menu-toggle span {
-    background-color: #fff;
+header .menu-toggle .menu-icon {
+    color: #fff;
 }
 
 
-header .nav-links a:hover,
+.nav-links a:hover,
 header .nav-brand:hover {
     color: #FAFAFA;
 }
@@ -386,27 +399,23 @@ header.scrolled .nav-row {
 }
 
 header.scrolled .nav-brand,
-header.scrolled .nav-links a,
+body.header-scrolled .nav-links a,
 header.scrolled .nav-datetime,
 header.scrolled .nav-location {
     color: #FAFAFA;
 }
 
-header.scrolled .menu-toggle span {
-    background-color: #FAFAFA;
+header.scrolled .menu-toggle .menu-icon {
+    color: #FAFAFA;
 }
 
-header.scrolled .nav-links a:hover,
+body.header-scrolled .nav-links a:hover,
 header.scrolled .nav-brand:hover {
     color: #1a1a1a;
 }
 
 .menu-toggle {
     display: none;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 30px;
-    height: 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -417,20 +426,15 @@ header.scrolled .nav-brand:hover {
     -webkit-tap-highlight-color: transparent;
 }
 
-.menu-toggle span {
-    display: block;
-    width: 100%;
-    height: 1px;
-    background-color: var(--text-color);
-    transition: all 0.3s ease;
+.menu-toggle .menu-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--text-color);
+    transition: transform 0.35s ease, color 0.25s ease;
 }
 
-.menu-toggle.active span:nth-child(1) {
-    transform: translateY(5.5px) rotate(45deg);
-}
-
-.menu-toggle.active span:nth-child(2) {
-    transform: translateY(-5.5px) rotate(-45deg);
+.menu-toggle.active .menu-icon {
+    transform: rotate(45deg);
 }
 
 
@@ -736,6 +740,19 @@ footer#contact {
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
+    /* When the mobile menu is open, fade out <main> and <header> so the body's
+       dark background (which extends edge-to-edge under viewport-fit=cover) is
+       what shows in the iOS safe-area zones (dynamic island, home indicator).
+       Body bg matches the popup bg, so the dynamic island area looks uniform
+       even if iOS clamps the popup's `position: fixed` bounds to the safe area. */
+    main, header {
+        transition: opacity 0.25s ease;
+    }
+    body.menu-open main,
+    body.menu-open header {
+        opacity: 0;
+    }
+
     .site-logo {
         height: clamp(100px, 22vh, 220px);
     }
@@ -764,11 +781,15 @@ footer#contact {
     .nav-links {
         display: flex;
         position: fixed;
-        top: 0;
-        left: 0;
+        /* Overshoot the viewport by 200px on every side. This guarantees the dark
+           background extends past the dynamic island and home indicator on iOS,
+           regardless of whether viewport-fit=cover / env() values are picked up
+           (PWA shortcuts cache the viewport meta at install time). */
+        top: -200px;
+        left: -200px;
+        right: -200px;
+        bottom: -200px;
         transform: none;
-        width: 100%;
-        height: 100vh;
         background-color: var(--bg-color);
         flex-direction: column;
         justify-content: center;
@@ -787,7 +808,7 @@ footer#contact {
 
     .menu-toggle {
         position: fixed;
-        bottom: 1.75rem;
+        bottom: calc(1.75rem + env(safe-area-inset-bottom));
         left: 50%;
         right: auto;
         top: auto;
@@ -799,19 +820,18 @@ footer#contact {
         border: 1px solid transparent;
         box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 7px;
         padding: 0;
         margin: 0;
         transition: background-color 0.25s ease, border-color 0.25s ease;
         z-index: 2000;
     }
 
-    .menu-toggle span {
-        width: 18px;
-        background-color: #171717 !important;
+    .menu-toggle .menu-icon {
+        width: 22px;
+        height: 22px;
+        color: #171717;
     }
 
     .menu-toggle.active {
@@ -819,16 +839,9 @@ footer#contact {
         border-color: #FAFAFA;
     }
 
-    .menu-toggle.active span {
-        background-color: #FAFAFA !important;
-    }
-
-    .menu-toggle.active span:nth-child(1) {
-        transform: translateY(4px) rotate(45deg);
-    }
-
-    .menu-toggle.active span:nth-child(2) {
-        transform: translateY(-4px) rotate(-45deg);
+    .menu-toggle.active .menu-icon {
+        color: #FAFAFA;
+        transform: rotate(45deg);
     }
 
     .menu-toggle:active {

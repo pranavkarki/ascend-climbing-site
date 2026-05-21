@@ -201,6 +201,32 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 ---
 
+## iOS Safe Areas (dynamic island / home indicator)
+
+Both `index.html` and `cafe.html` set:
+- `<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">` — allows the page to render edge-to-edge on iPhones, behind the dynamic island and home indicator
+- `<meta name="apple-mobile-web-app-capable" content="yes">` — enables PWA standalone mode when added to home screen
+- `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` — transparent status bar in PWA, so the page bg (`#0e0e0e`) shows uniformly through the dynamic island region
+- `<meta name="theme-color" content="#0e0e0e">` — matches page bg
+
+Fixed/sticky elements that touch the screen edges add `env(safe-area-inset-*)` so they don't sit under the dynamic island or home indicator:
+- `header` → `top: calc(0.75rem + env(safe-area-inset-top))`
+- `.menu-toggle` (mobile, ≤992px) → `bottom: calc(1.75rem + env(safe-area-inset-bottom))`
+
+The mobile nav overlay (`.nav-links` at ≤992px) uses `position: fixed` with a flat `-200px` overshoot on all four sides:
+```css
+top: -200px; left: -200px; right: -200px; bottom: -200px;
+```
+Why hardcoded `-200px` (not `env(safe-area-inset-*)`)? `env()` returns 0 unless `viewport-fit=cover` is actually applied, and iOS PWA shortcuts cache the viewport meta at install time — so a PWA added to home screen *before* the meta tag was updated will still see `env(safe-area-inset-top) = 0`. The hardcoded overshoot covers the dynamic island and home indicator regardless. The popup's flex centering still centers content correctly because the overshoot is symmetric (element center = viewport center).
+
+**Critical**: `.nav-links` is a **direct child of `<body>`**, NOT inside `<header>`. WebKit (Safari/iOS) has a quirk where `position: fixed` *inside* a `position: sticky` ancestor is effectively trapped within the sticky parent's box — negative `top:` values don't extend past the sticky parent's bounds. Moving `.nav-links` out of the sticky `<header>` is what actually makes the overshoot work on iPhone. Do not move it back into the header.
+
+Because `.nav-links` is no longer inside `<header>`, the scroll-color states use a `body.header-scrolled` class instead of `header.scrolled .nav-links`. JS toggles **both** classes (`header.scrolled` and `body.header-scrolled`) on scroll past 200px.
+
+**Belt-and-suspenders for iOS popup coverage**: when `body.menu-open` is set, `<main>` and `<header>` fade to `opacity: 0` (mobile breakpoint only). This makes the body's `--bg-color` show through in the iOS safe-area zones (dynamic island, home indicator) — body bg matches popup bg, so even if iOS clamps the popup's `position: fixed` bounds to the safe area, the safe-area regions appear uniformly dark. The header's GSAP entrance animation uses `clearProps: 'transform,opacity'` (not just `transform`) so the CSS opacity rule isn't overridden by an inline `opacity: 1` left behind by GSAP.
+
+---
+
 ## Planned Additions (not yet implemented)
 
 - **Tailwind CSS** — decision pending. Current CSS is custom and hand-crafted. If added, use Play CDN for no-build setup. Risk: Tailwind resets and utilities may conflict with existing custom grid and typography.
