@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stagger: 0.07,
                 scrollTrigger: {
                     trigger: membershipRow,
-                    start: 'top 60%',
+                    start: 'top 85%',
                     toggleActions: 'play none none reverse'
                 }
             }

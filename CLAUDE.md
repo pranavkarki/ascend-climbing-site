@@ -3,7 +3,7 @@
 ## What This Is
 Static website for **Ascend Climbing**, a bouldering/climbing gym in Jhamsikhel, Lalitpur, Nepal.  
 Owner entity: ASCE Pvt. Ltd. / A South City Entertainment Pvt. Ltd.  
-Live URL: `https://ascendclimbing.com.np` — deployed on **Vercel** (`vercel.json` has `cleanUrls: true`).
+Deployed on **Vercel** (`vercel.json` has `cleanUrls: true`). Domain not yet acquired.
 
 No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
@@ -13,7 +13,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing hero, Pricing, Activities (Kids/Adult Courses), Features (Cafe/Gym/Shower subsections), Footer |
+| `index.html` | Main page: Landing hero, Pricing, Activities (Kids Courses/Adult Courses/Rock Day), Features (Cafe/Gym/Shower subsections), Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles — single shared file |
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
@@ -77,8 +77,9 @@ CDN script order in HTML (order matters):
 - `.landing-brand`: Gandur New (fallback Bebas Neue), weight 300, `clamp(72px, 14vw, 200px)`, line-height 0.88, white — primary landing hero text
 - `.landing-climbing-sub`: Inconsolata, 24px (16px mobile), weight 600, uppercase, letter-spacing 0.35em
 - `.landing-tagline`: Inconsolata, 14px, uppercase, letter-spacing 0.2em, opacity 1
-- `h2`: 96px, weight 700, uppercase
-- `h3`: 24px, weight 600
+- `h2`: 96px, weight 700, uppercase — section headers (Pricing, Activities, Features)
+- `h3`: `clamp(24px, 3vw, 32px)`, weight 600, uppercase — subsection headings (Day Passes, Memberships, Kids Courses, Adult Courses, Rock Day). Mobile override: 28px
+- `h4`: 24px, weight 600, uppercase — sub-subsection headings (Boulder Pass—, w/ Shoes—, Ages 6–8—, etc.). Mobile override: 20px
 - Body/p/span/li/a: 14px, weight 400
 
 > Note: `.landing-heading` class still exists in CSS but is no longer used in the HTML — replaced by `.landing-brand`.
@@ -118,7 +119,7 @@ CDN script order in HTML (order matters):
 | `.feature-img-wrap` | Image container — `aspect-ratio: 4/3`, `overflow: hidden`, `background-color: #0000CD` (blue shows before reveal). Has an `img` for real photos, empty for placeholders |
 | `.feature-img-placeholder` | Added to `.feature-img-wrap` when no real image yet — overrides to `background-color: #000` (black), while `.feature-img-wrap` itself is blue (`#0000CD`) |
 | `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
-| `.feature-index` | `[001]` / `[002]` / `[003]` label above each image — green `#39FF14`, monospace, `letter-spacing: 0.1em`, same style as section header subtitles |
+| `.feature-index` | `[001]` / `[002]` / `[003]` label placed directly above a heading — green `#39FF14`, monospace, `letter-spacing: 0.1em`, `display: block`, `margin-bottom: 0.5rem`. Used in Features (above each feature image) and in Pricing/Activities (above each subsection `h3`). Numbering restarts at `[001]` per section. |
 | `.pricing-label`, `.activities-label`, `.features-label` | Green `#39FF14` inline label spans inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em`. No space character before the span in HTML — gap is controlled purely by `margin-left`. |
 
 ---
@@ -166,7 +167,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 ### 7. Day Pass Price Flash Animation
 - `.pass-price` elements: GSAP `fromTo` on scroll-in — starts blue (`#0000CD`), transitions to white (`#FAFAFA`)
 - Duration 0.7s, ease `power2.out`, staggered by 0.15s per card
-- Font size: `24px / weight 600` (matches `h3`) on both desktop and mobile
+- Font size: `24px / weight 600` (matches `h4`) on both desktop and mobile
 
 ### 8. Image Reveals (deferred until after preloader)
 - `.img-reveal-container` inside a `.scroll-section`: scrub clip-path from `inset(100% 0% 0% 0%)` → `inset(0%)`
@@ -198,7 +199,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 ## Responsive Breakpoints
 
-- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`
+- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`. `h3` → 28px, `h4` → 20px, `.membership-row-item` → 20px/32px line-height (matches `h4`). `.subsection-break` border suppressed on mobile (spacing only). First `.pricing-pass-card` and `.course-cards-row` card have `border-top: none` to avoid a line directly under subsection headings.
 - **≤ 480px**: Logo size reduction only
 
 ---
@@ -242,6 +243,9 @@ Because `.nav-links` is no longer inside `<header>`, the scroll-color states use
 **Memberships w/o Shoes**: 1M 7000 | 3M 17000 | 6M 27000 | Annual 37000  
 **Kids Courses**: Ages 6-8 → Mon 5-6:30pm, 6 weeks, NPR 11000 | Ages 9-12 → Tue 4-6pm, 6 weeks, NPR 14000 | Ages 13-16 → Tue 4-6pm, 6 weeks, NPR 14000  
 **Adult Courses**: Fundamentals / Women's Bouldering / Lead Climbing  
+**Rock Day (Non-Members, Total)**: 1 pax 19000 | 2 pax 24000 | 3 pax 30000 | 4 pax 36000  
+**Rock Day (Members, Per Person)**: 4-pax group 4000 | private 1–3 pax → non-member rates apply  
+**Rock Day includes**: Rock Level I certified guides, safety gear & first aid, food/snacks/hydration/transport, serene views  
 *All prices include VAT. Students/kids get 15% discount.*
 
 ---

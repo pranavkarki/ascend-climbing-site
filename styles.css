@@ -127,17 +127,19 @@ h2 {
 }
 
 h3 {
-    font-size: 24px;
+    font-size: clamp(24px, 3vw, 32px);
     font-weight: 600;
-    line-height: 32px;
+    line-height: 1.2;
     margin-bottom: 0.25rem;
     text-transform: uppercase;
 }
 
 h4 {
-    font-size: 0.875rem;
-    font-weight: 400;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
     margin-bottom: 0.25rem;
+    text-transform: uppercase;
 }
 
 p,
@@ -232,6 +234,12 @@ section.no-pad {
 
 .grid-row.heading-row {
     padding-bottom: 0;
+}
+
+.grid-row.subsection-break {
+    border-top: var(--line-thickness) solid var(--line-color);
+    margin-top: 1rem;
+    padding-top: 2rem;
 }
 
 .grid-row.compact {
@@ -568,6 +576,32 @@ header.scrolled .nav-brand:hover {
 }
 
 
+/* Rock Day */
+.rock-day-included-heading {
+    margin-bottom: 1rem;
+}
+
+.perks-list li {
+    text-transform: uppercase;
+}
+
+.perks-rate {
+    color: #39FF14;
+}
+
+.table-subtitle {
+    font-size: 14px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.rock-day-member-note {
+    margin-top: 1rem;
+    font-size: 14px;
+    opacity: 0.6;
+}
+
 /* Images */
 .overflow-hidden {
     overflow: hidden;
@@ -854,6 +888,20 @@ footer#contact {
         font-size: clamp(2rem, 11vw, 96px);
     }
 
+    h3 {
+        font-size: 28px;
+    }
+
+    h4 {
+        font-size: 20px;
+    }
+
+    .grid-row.subsection-break {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 1.5rem;
+    }
+
     /* Day pass cards: stack full-width with divider lines */
     .pricing-passes-row {
         padding: 0;
@@ -868,6 +916,11 @@ footer#contact {
     .pricing-pass-card {
         border-top: var(--line-thickness) solid var(--line-color);
         padding: 1.5rem 0;
+    }
+
+    .pricing-passes-row .pricing-pass-card:first-child,
+    .course-cards-row .pricing-pass-card:first-child {
+        border-top: none;
     }
 
     /* Course cards: stack all three columns full-width with divider lines */
@@ -890,9 +943,9 @@ footer#contact {
         padding-top: 0;
     }
 
-    /* Membership: fix column placement, go side-by-side */
-    .pricing-membership-row .col-2 {
-        grid-column: 1;
+    .membership-row-item {
+        font-size: 20px;
+        line-height: 32px;
     }
 
     .col-span-right {
