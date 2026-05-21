@@ -146,11 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
         .from('.landing-tagline',      { y: 15, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3');
 
     const scrambleChars = CONFIG.SCRAMBLE_CHARS;
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     document.querySelectorAll('a').forEach(link => {
         if (link.children.length > 0) return;
         if (!link.hasAttribute('data-original-text')) {
             link.setAttribute('data-original-text', link.innerText);
         }
+        if (!canHover) return;
         link.addEventListener('mouseenter', () => {
             const originalText = link.getAttribute('data-original-text');
             let obj = { value: 0 };

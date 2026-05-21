@@ -381,7 +381,8 @@ header .nav-brand:hover {
     color: #FAFAFA;
 }
 
-header.scrolled {
+header.scrolled,
+body.header-scrolled {
     --link-highlight: #FAFAFA;
 }
 
