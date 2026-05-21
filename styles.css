@@ -709,7 +709,7 @@ footer#about a:hover   { color: #FAFAFA; }
     font-family: var(--font-mono);
     font-size: 14px;
     font-weight: 400;
-    color: var(--color-accent);
+    color: #FFE600;
     letter-spacing: 0.1em;
 }
 
