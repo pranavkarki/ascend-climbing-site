@@ -122,6 +122,11 @@ CDN script order in HTML (order matters):
 | `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
 | `.feature-index` | `[001]` / `[002]` / `[003]` label placed directly above a heading — green `#39FF14`, monospace, `letter-spacing: 0.1em`, `display: block`, `margin-bottom: 0.5rem`. Used in Features (above each feature image) and in Pricing/Activities (above each subsection `h3`). Numbering restarts at `[001]` per section. |
 | `.pricing-label`, `.activities-label`, `.features-label` | Green `#39FF14` inline label spans inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em`. No space character before the span in HTML — gap is controlled purely by `margin-left`. |
+| `.footer-grid` | 2-col grid: `minmax(280px,1fr) minmax(0,2fr)`, `gap: 80px`. Left col = big diagonal arrow SVG. Right col = eyebrow + nav list. Collapses to 1-col at ≤992px |
+| `.footer-nav-list` / `.footer-nav-row` | Nav list of 5 page anchors. Row = grid `96px 1fr 56px`. Hover: `padding-left: 12px` slide + name nudge + diagonal arrow swap (main↗ exits, ghost enters from ↙). Global `a::before` suppressed on all footer links |
+| `.footer-wordmark` | `position: absolute; left: var(--gutter); bottom: 32px` — "Ascend / Climbing / Gym ↘" stacked, goes static at ≤992px |
+| `.footer-bottom-bar` | 8-col grid `1fr auto auto 1fr auto auto auto auto`. `margin-left: 240px` on desktop to clear wordmark. Contains tagline / copyright / 2 spacers / phone / email / Facebook / Instagram |
+| `.footer-bb-cell` | Bottom bar cell — `display: flex`, `padding: 14px 24px`, `border-right` hairline rules. `.spacer` has `padding: 0; border-right: none` |
 
 ---
 
@@ -139,6 +144,7 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 
 ### 2. Header & Landing Entrance Animations
 - Header: slides down from `-100%` y + fades in, duration 0.7s, `power3.out`, delay 0.1s
+- `.nav-links` (desktop only, `min-width: 993px`): same slide-in as header — was implicit when nav lived inside `<header>`, made explicit after the iOS fix moved it to a direct `<body>` child
 - `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s, `clearProps: 'transform'` — required to restore CSS `transform: translateX(-50%)` centering after GSAP finishes
 - Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
 - `onComplete` on the entrance timeline calls `startHeroIdleAnimations()`

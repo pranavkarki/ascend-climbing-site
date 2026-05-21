@@ -652,9 +652,161 @@ header.scrolled .nav-brand:hover {
 }
 
 
-/* Footer Line Extension */
-footer#contact {
+/* ===================== FOOTER ===================== */
+footer#about {
     position: relative;
+    background: #0000CD;
+    color: #FAFAFA;
+    padding: 4rem var(--gutter) 0;
+    overflow: hidden;
+}
+
+/* Suppress global blue-fill hover — blue-on-blue is invisible anyway */
+footer#about a::before { display: none; }
+footer#about a:hover   { color: #FAFAFA; }
+
+/* Eyebrow label */
+.footer-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0 0 1.5rem;
+    color: #FAFAFA;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.footer-eyebrow::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #FAFAFA;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Nav link list */
+.footer-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgba(250, 250, 250, 0.35);
+}
+.footer-nav-list li { border-bottom: 1px solid rgba(250, 250, 250, 0.35); }
+
+.footer-nav-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 10px 4px 10px 0;
+    color: #FAFAFA;
+    position: relative;
+    overflow: hidden;
+    transition: padding-left 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.footer-nav-row:hover {
+    padding-left: 12px;
+    color: #FAFAFA;
+}
+
+/* [001] index label — matches .feature-index from other sections */
+.footer-nav-idx {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-accent);
+    letter-spacing: 0.1em;
+}
+
+/* Nav name — h4 scale */
+.footer-nav-name {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.footer-nav-row:hover .footer-nav-name { transform: translateX(6px); }
+
+.footer-nav-arrow-wrap {
+    justify-self: end;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    overflow: hidden;
+}
+.footer-nav-arrow {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.footer-nav-arrow.ghost { transform: translate(-100%, 100%); }
+.footer-nav-row:hover .footer-nav-arrow.main  { transform: translate(100%, -100%); }
+.footer-nav-row:hover .footer-nav-arrow.ghost { transform: translate(0, 0); }
+
+/* Wordmark — h4 scale, anchored bottom-left */
+.footer-wordmark {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 32px;
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    color: #FAFAFA;
+    z-index: 2;
+}
+.footer-wordmark .stack { display: block; font-size: 24px; font-weight: 600; }
+
+/* Bottom bar — gap matches inter-section spacing */
+.footer-bottom-bar {
+    margin-top: 4rem;
+    margin-bottom: 32px;
+    margin-left: 240px;
+    border-top: 1px solid rgba(250, 250, 250, 0.85);
+    border-bottom: 1px solid rgba(250, 250, 250, 0.85);
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr auto auto auto auto;
+    align-items: stretch;
+}
+.footer-bb-cell {
+    padding: 14px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: -0.005em;
+    border-right: 1px solid rgba(250, 250, 250, 0.85);
+    color: #FAFAFA;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    white-space: nowrap;
+    transition: background 0.25s ease;
+}
+.footer-bb-cell:last-child { border-right: none; }
+.footer-bb-cell.tagline { font-weight: 500; }
+.footer-bb-cell.spacer  { border-right: none; pointer-events: none; padding: 0; }
+a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
+
+/* Responsive */
+@media (max-width: 992px) {
+    footer#about { padding-top: 3rem; }
+    .footer-wordmark { position: static; margin: 3rem 0 1.5rem; }
+    .footer-bottom-bar { margin-left: 0; margin-top: 3rem; grid-template-columns: 1fr; }
+    .footer-bb-cell {
+        border-right: none;
+        border-bottom: 1px solid rgba(250, 250, 250, 0.85);
+        justify-content: space-between;
+    }
+    .footer-bb-cell.spacer { display: none; }
+    .footer-nav-name { font-size: 20px; }
 }
 
 /* Pricing Footer Note */
@@ -666,7 +818,7 @@ footer#contact {
 .features-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    row-gap: 6rem;
+    row-gap: 3rem;
     column-gap: 10rem;
     padding: 1.5rem 0;
 }
