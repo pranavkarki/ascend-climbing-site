@@ -19,6 +19,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
 | `img/square/` | 9 square climbing photos for fullscreen preloader roulette |
 | `img/optimized/` | Optimised assets — `wall.jpg` (hero bg), `cafe.avif` (cafe feature subsection) |
+| `img/site-favicon.svg` | SVG favicon — white circle (`#FAFAFA`) with dark (`#171717`) star/asterisk icon, mirrors the mobile navbar button design |
 | `img/` | Larger gym photos (JPG/WEBP) |
 | `fonts/` | Local font files — `Gandur New-Light.otf` |
 | `ref/` | Course images (`kids_image.png`, `adult_image.png`), logo, reference screenshots |
