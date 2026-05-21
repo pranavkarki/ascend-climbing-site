@@ -70,6 +70,7 @@ CDN script order in HTML (order matters):
 - `.grid-row.compact` → reduced padding
 - `.grid-row.full-bleed` → zero padding, for image sections
 - `.grid-row.no-border` → suppresses row border
+- `.grid-row.heading-row` → `padding-bottom: 0`. Section header `h2`s (`#pricing-section-header`, `#activities-section-header`, `#features-section-header`) have `padding-bottom: 0.75rem` to control spacing below the heading text.
 
 ### Typography
 - `h1` (standard): 128px, weight 500, uppercase, line-height 1
@@ -118,6 +119,7 @@ CDN script order in HTML (order matters):
 | `.feature-img-placeholder` | Added to `.feature-img-wrap` when no real image yet — overrides to `background-color: #000` (black), while `.feature-img-wrap` itself is blue (`#0000CD`) |
 | `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
 | `.feature-index` | `[001]` / `[002]` / `[003]` label above each image — green `#39FF14`, monospace, `letter-spacing: 0.1em`, same style as section header subtitles |
+| `.pricing-label`, `.activities-label`, `.features-label` | Green `#39FF14` inline label spans inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em`. No space character before the span in HTML — gap is controlled purely by `margin-left`. |
 
 ---
 

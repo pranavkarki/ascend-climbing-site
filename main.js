@@ -60,21 +60,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Day pass prices: flash neon green then settle to white on scroll-in
-    document.querySelectorAll('.pass-price').forEach((el, i) => {
-        gsap.fromTo(el,
-            { color: '#39FF14', immediateRender: false },
-            {
-                color: '#FAFAFA',
-                duration: 0.7,
-                ease: 'power2.out',
-                delay: 0.45 + i * 0.15,
-                scrollTrigger: {
-                    trigger: el.closest('.scroll-section'),
-                    start: 'top 85%',
-                    toggleActions: 'play none none reset'
+    document.querySelectorAll('.scroll-section').forEach(section => {
+        section.querySelectorAll('.pass-price').forEach((el, i) => {
+            gsap.fromTo(el,
+                { color: '#39FF14', immediateRender: false },
+                {
+                    color: '#FAFAFA',
+                    duration: 0.7,
+                    ease: 'power2.out',
+                    delay: 0.45 + i * 0.15,
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top 85%',
+                        toggleActions: 'play none none reset'
+                    }
                 }
-            }
-        );
+            );
+        });
     });
 
     // Feature image/placeholder reveal: wipes up from blue background

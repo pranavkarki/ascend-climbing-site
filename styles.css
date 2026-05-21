@@ -41,13 +41,13 @@ body {
     font-family: var(--font-mono);
     font-weight: 400;
     background-color: var(--bg-color);
-    /* Same noise SVG as body::after but with opacity baked into the SVG (rect opacity=0.12).
+    /* Same noise SVG as body::after but with opacity baked into the SVG (rect opacity=0.08).
        The ::after overlay is position:fixed and gets clamped by iOS Safari to the safe-area-
        bounded viewport, so it doesn't reach the dynamic island / URL-bar strips. Body's
        background-image does reach those strips (body extends edge-to-edge under viewport-fit=cover),
        so when <main> is hidden during menu-open, the safe-area strips show the same dark+noise
        as the popup interior instead of pure flat #0e0e0e. */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 350px 350px;
     color: var(--text-color);
@@ -72,7 +72,7 @@ body::after {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 350px 350px;
-    opacity: 0.12;
+    opacity: 0.08;
     /* Adjust this value for stronger/weaker noise */
 }
 
@@ -181,11 +181,11 @@ section {
 }
 
 #pricing-section-header {
-    padding-bottom: 2.5rem;
+    padding-bottom: 0.75rem;
 }
 
 #activities-section-header {
-    padding-bottom: 2.5rem;
+    padding-bottom: 0.75rem;
 }
 
 #activities {
@@ -197,7 +197,7 @@ section {
 }
 
 #features-section-header {
-    padding-bottom: 2.5rem;
+    padding-bottom: 0.75rem;
 }
 
 
@@ -208,6 +208,7 @@ section {
     color: #39ff14;
     letter-spacing: 0.1em;
     vertical-align: baseline;
+    margin-left: 1.8em;
 }
 
 .activities-label,
@@ -217,6 +218,7 @@ section {
     color: #39ff14;
     letter-spacing: 0.1em;
     vertical-align: baseline;
+    margin-left: 1.8em;
 }
 
 section.no-pad {
@@ -573,10 +575,18 @@ header.scrolled .nav-brand:hover {
 }
 
 /* Membership Tables */
+.col-span-right {
+    grid-column: 2 / span 2;
+}
+
 .membership-tables-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 3rem;
+    flex-direction: row;
+    gap: 4rem;
+}
+
+.membership-tables-wrapper .membership-table {
+    flex: 1;
 }
 
 .membership-table {
@@ -592,10 +602,25 @@ header.scrolled .nav-brand:hover {
     justify-content: space-between;
     padding: 0.5rem 0;
     border-bottom: var(--line-thickness) solid var(--line-color);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+    text-transform: uppercase;
 }
 
 .membership-row-item:last-child {
     border-bottom: none;
+}
+
+.membership-row-item span {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+
+.membership-row-item .pass-price {
+    margin-top: 0;
+    padding-top: 0;
 }
 
 /* Courses blocks */
@@ -1004,6 +1029,10 @@ footer#contact {
         grid-column: 1;
     }
 
+    .col-span-right {
+        grid-column: 1;
+    }
+
     .membership-table {
         min-width: 0;
     }
@@ -1027,6 +1056,10 @@ footer#contact {
 @media (max-width: 480px) {
     .site-logo {
         height: clamp(80px, 18vh, 120px);
+    }
+
+    .membership-tables-wrapper {
+        flex-direction: column;
     }
 }
 
