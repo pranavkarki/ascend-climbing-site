@@ -78,7 +78,7 @@ CDN script order in HTML (order matters):
 - `.landing-climbing-sub`: Inconsolata, 24px (16px mobile), weight 600, uppercase, letter-spacing 0.35em
 - `.landing-tagline`: Inconsolata, 14px, uppercase, letter-spacing 0.2em, opacity 1
 - `h2`: 96px, weight 700, uppercase — section headers (Pricing, Activities, Features)
-- `h3`: `clamp(24px, 3vw, 32px)`, weight 600, uppercase — subsection headings (Day Passes, Memberships, Kids Courses, Adult Courses, Rock Day). Mobile override: 28px
+- `h3`: `clamp(24px, 3vw, 32px)`, weight 600, line-height 32px, uppercase — subsection headings (Day Passes, Memberships, Kids Courses, Adult Courses, Rock Day). Mobile override: 28px
 - `h4`: 24px, weight 600, uppercase — sub-subsection headings (Boulder Pass—, w/ Shoes—, Ages 6–8—, etc.). Mobile override: 20px
 - Body/p/span/li/a: 14px, weight 400
 
@@ -167,7 +167,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 ### 7. Day Pass Price Flash Animation
 - `.pass-price` elements: GSAP `fromTo` on scroll-in — starts blue (`#0000CD`), transitions to white (`#FAFAFA`)
 - Duration 0.7s, ease `power2.out`, staggered by 0.15s per card
-- Font size: `24px / weight 600` (matches `h4`) on both desktop and mobile
+- Font size: `24px / weight 600` desktop, `20px` mobile (matches `h4`)
 
 ### 8. Image Reveals (deferred until after preloader)
 - `.img-reveal-container` inside a `.scroll-section`: scrub clip-path from `inset(100% 0% 0% 0%)` → `inset(0%)`
@@ -199,7 +199,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 ## Responsive Breakpoints
 
-- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`. `h3` → 28px, `h4` → 20px, `.membership-row-item` → 20px/32px line-height (matches `h4`). `.subsection-break` border suppressed on mobile (spacing only). First `.pricing-pass-card` and `.course-cards-row` card have `border-top: none` to avoid a line directly under subsection headings.
+- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`. `h3` → 28px, `h4` → 20px, `.pass-price` → 20px, `.membership-row-item` → 20px/32px line-height (matches `h4`). `.subsection-break` border suppressed on mobile (spacing only). First `.pricing-pass-card` and `.course-cards-row` card have `border-top: none` to avoid a line directly under subsection headings.
 - **≤ 480px**: Logo size reduction only
 
 ---

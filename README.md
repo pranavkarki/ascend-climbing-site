@@ -2,8 +2,6 @@
 
 Website for **Ascend Climbing** — a bouldering and climbing gym in Jhamsikhel, Lalitpur, Nepal.
 
-Live: [ascendclimbing.com.np](https://ascendclimbing.com.np)
-
 ---
 
 ## Stack
