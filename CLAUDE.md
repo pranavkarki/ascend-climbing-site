@@ -13,7 +13,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing hero, Pricing, Activities (Kids Courses/Adult Courses/Rock Day), Features (Cafe/Gym/Shower subsections), Footer |
+| `index.html` | Main page: Landing hero, Pricing, Activities (Kids Courses/Adult Courses/Rock Day), Features (Cafe/Gym/Shower subsections), Testimonials carousel, Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles — single shared file |
 | `main.js` | All JS — single shared file, runs on `DOMContentLoaded` |
@@ -35,6 +35,7 @@ No build system. Pure HTML + CSS + JS. No npm, no bundler.
 - **Inconsolata** (Google Fonts, 400 weight) — body text
 - **Bebas Neue** (Google Fonts) — fallback display font
 - **Gandur New** (local, `fonts/Gandur New-Light.otf`, weight 300) — primary landing brand heading
+- **Newsreader** (Google Fonts, italic 500) — serif italic emphasis in Testimonials carousel decorations
 - No framework, no Tailwind (yet)
 
 CDN script order in HTML (order matters):
@@ -122,6 +123,14 @@ CDN script order in HTML (order matters):
 | `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
 | `.feature-index` | `[001]` / `[002]` / `[003]` label placed directly above a heading — green `#39FF14`, monospace, `letter-spacing: 0.1em`, `display: block`, `margin-bottom: 0.5rem`. Used in Features (above each feature image) and in Pricing/Activities (above each subsection `h3`). Numbering restarts at `[001]` per section. |
 | `.pricing-label`, `.activities-label`, `.features-label` | Green `#39FF14` inline label spans inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em`. No space character before the span in HTML — gap is controlled purely by `margin-left`. |
+| `#testimonials` | Section between Features and Footer. Contains eyebrow + section title (`.testi-title-main` Inconsolata + `.testi-title-serif` Newsreader italic green) and the featured carousel. `padding-top: var(--section-pt)` |
+| `.testi-carousel-wrap` | Direct child of `.grid-container` in `#testimonials`. Has `border-top` hairline. Children: `.testi-quote`, `.testi-attrib`, `.testi-footer-row` |
+| `.testi-quote` | Big decorated quote block — Inconsolata, `clamp(20px, 2.6vw, 38px)`. Content populated by JS. `min-height` is set dynamically by JS on init (tallest slide measured invisibly) — do not rely on the CSS `min-height: 6.5em` fallback for layout stability. `transition: opacity, transform` used for carousel fade |
+| `.t-pill`, `.t-outline`, `.t-oval`, `.t-sparkle`, `.t-wave`, `.t-underline` | Inline decoration spans inside `.testi-quote`. All use Newsreader italic. Green (`#39FF14`) accent color. `.t-pill` = green bg dark text; `.t-outline` = green border; `.t-oval` = SVG ellipse; `.t-sparkle` = `✦` before/after via pseudo-elements; `.t-wave`/`.t-underline` = SVG stroke underlines |
+| `.testi-attrib` | Attribution row below quote: dash + uppercase name + `✦` stars (green) + muted "via Google · X ago". Populated by JS |
+| `.testi-footer-row` | Bottom of carousel: counter (`.testi-counter`, e.g. "01 / 06") on left, controls (dots + prev/next buttons) on right. `border-top` hairline |
+| `.testi-dot` | Dot pager button — `6×6px` round, dim white inactive; active = green `#39FF14`, `width: 22px`, pill shape |
+| `.testi-nav` | Circular prev/next buttons — `38px`, hairline border, hover inverts to white fill |
 | `.footer-grid` | 2-col grid: `minmax(280px,1fr) minmax(0,2fr)`, `gap: 80px`. Left col = big diagonal arrow SVG. Right col = eyebrow + nav list. Collapses to 1-col at ≤992px |
 | `.footer-nav-list` / `.footer-nav-row` | Nav list of 5 page anchors. Row = grid `96px 1fr 56px`. Hover: `padding-left: 12px` slide + name nudge + diagonal arrow swap (main↗ exits, ghost enters from ↙). Global `a::before` suppressed on all footer links |
 | `.footer-wordmark` | `position: absolute; left: var(--gutter); bottom: 32px` — "Ascend / Climbing / Gym ↘" stacked, goes static at ≤992px |
@@ -153,6 +162,13 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`.
 - **Triangle spin** (`#geo-tri-a`, bottom-left triangle): 360° rotation, `power2.inOut`, 1.1s, `svgOrigin: '114 75'` (centroid), repeats every 7–12s after a 1.5s initial delay
 - **Circle bounce** (`#geo-circle-tr`, top-right circle): bounces up 12px (`power2.out` up, `bounce.out` down), repeats every 5–9s after a 2.5s initial delay
+
+### 2b. Scroll-Hide Navbar
+- After scrolling past `#landing` bottom: scrolling **down** fires `gsap.to([header, navLinksEl], { y: -120, ... })` on both elements simultaneously; scrolling **up** animates both back to `y: 0`
+- Uses GSAP (not CSS transitions) so both elements are on the same frame — avoids the pill-before-text timing mismatch that CSS transitions produce (header is sticky/no base transform; `.nav-links` has `translate(-50%,-50%)` — compositing order differs)
+- `navIsHidden` bool + `navHiddenAtY` guard re-triggering; `overwrite: true` cancels in-progress tweens
+- **30px hysteresis**: once hidden, nav only reappears after scrolling up ≥ 30px from the position where it hid (`navHiddenAtY - scrollY > 30`). Prevents Lenis micro-adjustments or carousel height changes from briefly registering as "scroll up" and flashing the nav
+- `.menu-toggle` (mobile hamburger) is intentionally unaffected — it's a separate `position: fixed` element
 
 ### 3. `updateNavDateTime()` — Live Clock
 - Updates `#nav-datetime` every second
@@ -198,7 +214,16 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - Adding a real `<img>` to a placeholder automatically uses the blur+wipe path — no JS changes needed
 - Scale `1.03 → 1` during unblur prevents the blur from bleeding past `overflow: hidden` and showing the blue background at the edge
 
-### 12. Header Height CSS Var
+### 12. Testimonials Carousel (`initTestimonialsCarousel`)
+- IIFE inside `DOMContentLoaded`. Populates `#testi-quote`, `#testi-attrib`, `#testi-dots`, `#testi-counter` from a `REVIEWS` array (6 reviews, each with `parts` array of `{t: text}` or `{d: decoration-type, t: text}`)
+- Decoration types: `pill`, `outline`, `oval`, `sparkle`, `wave`, `underline` → mapped to `.t-*` CSS classes
+- **Layout-shift prevention**: on init, all reviews are rendered invisibly into `quoteEl` to measure their natural height; the tallest result is set as `quoteEl.style.minHeight`. This keeps the quote box a fixed height across all slides so nothing below shifts — if this measurement is removed, carousel transitions will cause other sections to jump and may incorrectly re-trigger ScrollTrigger scroll animations
+- Carousel transitions: sets `quoteEl.style.opacity = '0'` + `translateY(7px)`, updates content, then `requestAnimationFrame` restores opacity + translate via inline transition
+- Auto-rotates every 8s (`setInterval`). Resets timer on any manual navigation
+- Keyboard: `ArrowLeft`/`ArrowRight` fire only when `#testimonials` is in the viewport (`getBoundingClientRect` check)
+- Star symbol in attribution: `✦` (U+2726, four-pointed star) in neon green. Inactive stars shown at `opacity: 0.2`
+
+### 13. Header Height CSS Var
 - `updateHeaderHeight()` sets `--header-height` on `:root` to actual header pixel height
 - Runs on load and `resize`
 

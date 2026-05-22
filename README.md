@@ -46,6 +46,8 @@ Open any of the three source files directly — there's no dev server or build s
 
 **To add a real image to a feature placeholder:** drop an `<img>` inside any `.feature-img-wrap` — the JS reveal animation picks it up automatically.
 
+**To remove the extra side indent on Pricing / Activities / Features:** these three sections have `padding-left: var(--gutter); padding-right: var(--gutter)` added in `styles.css` (on top of the gutter already on `<main>`), giving them the same double-inset as the testimonials carousel. To revert to single-gutter alignment, delete those two lines from the `#pricing`, `#activities`, and `#features` rules in `styles.css`.
+
 ---
 
 ## Deploy

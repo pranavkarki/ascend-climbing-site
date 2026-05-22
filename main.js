@@ -129,10 +129,31 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', updateHeaderHeight);
 
     const header = document.querySelector('header');
+    const navLinksEl = document.querySelector('.nav-links');
+    const landingEl = document.getElementById('landing');
+    let lastScrollY = window.scrollY;
+    let navIsHidden = false;
+    let navHiddenAtY = 0;
+
     const onScroll = () => {
-        const scrolled = window.scrollY > CONFIG.SCROLL_THRESHOLD;
+        const scrollY = window.scrollY;
+        const scrolled = scrollY > CONFIG.SCROLL_THRESHOLD;
         header.classList.toggle('scrolled', scrolled);
         document.body.classList.toggle('header-scrolled', scrolled);
+
+        if (landingEl) {
+            const pastLanding = scrollY > landingEl.offsetTop + landingEl.offsetHeight;
+
+            if (!navIsHidden && pastLanding && scrollY > lastScrollY) {
+                navIsHidden = true;
+                navHiddenAtY = scrollY;
+                gsap.to([header, navLinksEl], { y: -120, duration: 0.4, ease: 'power3.in', overwrite: true });
+            } else if (navIsHidden && (!pastLanding || navHiddenAtY - scrollY > 30)) {
+                navIsHidden = false;
+                gsap.to([header, navLinksEl], { y: 0, duration: 0.45, ease: 'power3.out', overwrite: true });
+            }
+        }
+        lastScrollY = scrollY;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -476,6 +497,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const CLASS_MAP = { pill: 't-pill', outline: 't-outline', oval: 't-oval', sparkle: 't-sparkle', wave: 't-wave', underline: 't-underline' };
         let current = 0;
         let autoTimer = null;
+
+        // Measure max height across all slides and lock min-height to prevent layout shifts
+        quoteEl.style.visibility = 'hidden';
+        let maxQuoteH = 0;
+        for (const r of REVIEWS) {
+            renderQuote(r);
+            maxQuoteH = Math.max(maxQuoteH, quoteEl.scrollHeight);
+        }
+        quoteEl.style.visibility = '';
+        quoteEl.style.minHeight = maxQuoteH + 'px';
 
         function renderQuote(r) {
             quoteEl.innerHTML = r.parts.map(p =>
