@@ -1,6 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     gsap.registerPlugin(ScrollTrigger);
 
+    // Reveal body and pre-set entrance initial states in the same sync task so
+    // the browser paints only once — with body visible but elements at their
+    // animated-from positions, preventing the flash-then-disappear effect.
+    document.body.style.opacity = '1';
+    gsap.set('header',               { yPercent: -100, opacity: 0 });
+    gsap.set('.menu-toggle',         { y: 30, opacity: 0 });
+    gsap.set('.landing-geo',         { y: 20, opacity: 0 });
+    gsap.set('.landing-brand',       { y: 50, opacity: 0 });
+    gsap.set('.landing-climbing-sub',{ y: 20, opacity: 0 });
+    gsap.set('.landing-tagline',     { y: 15, opacity: 0 });
+    if (window.matchMedia('(min-width: 993px)').matches) {
+        gsap.set('.nav-links', { yPercent: -100, opacity: 0 });
+    }
+
     const ST_PLAY_REVERSE = (trigger) => ({ trigger, start: 'top 85%', toggleActions: 'play none none reverse' });
     const ST_PLAY_RESET   = (trigger) => ({ trigger, start: 'top 85%', toggleActions: 'play none none reset' });
 
@@ -137,11 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const onScroll = () => {
         const scrollY = window.scrollY;
-        const scrolled = scrollY > CONFIG.SCROLL_THRESHOLD;
-        header.classList.toggle('scrolled', scrolled);
-        document.body.classList.toggle('header-scrolled', scrolled);
+        const menuIsOpen = document.body.classList.contains('menu-open');
 
-        if (landingEl) {
+        if (!menuIsOpen) {
+            const scrolled = scrollY > CONFIG.SCROLL_THRESHOLD;
+            header.classList.toggle('scrolled', scrolled);
+            document.body.classList.toggle('header-scrolled', scrolled);
+        }
+
+        if (landingEl && !menuIsOpen) {
             const pastLanding = scrollY > landingEl.offsetTop + landingEl.offsetHeight;
 
             if (!navIsHidden && pastLanding && scrollY > lastScrollY) {
@@ -160,17 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    gsap.from(header, { yPercent: -100, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
+    gsap.to(header, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
     if (window.matchMedia(`(min-width: ${CONFIG.MOBILE_BREAKPOINT + 1}px)`).matches) {
-        gsap.from('.nav-links', { yPercent: -100, opacity: 0, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
+        gsap.to('.nav-links', { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
     }
-    gsap.from('.menu-toggle', { y: 30, opacity: 0, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
+    gsap.to('.menu-toggle', { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
 
     gsap.timeline({ delay: 0.5, onComplete: startHeroIdleAnimations })
-        .from('.landing-geo',          { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' })
-        .from('.landing-brand',        { y: 50, opacity: 0, duration: 0.9, ease: 'power3.out' }, '-=0.3')
-        .from('.landing-climbing-sub', { y: 20, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
-        .from('.landing-tagline',      { y: 15, opacity: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3');
+        .to('.landing-geo',          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' })
+        .to('.landing-brand',        { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, '-=0.3')
+        .to('.landing-climbing-sub', { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+        .to('.landing-tagline',      { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.3');
 
     const scrambleChars = CONFIG.SCRAMBLE_CHARS;
     const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -325,6 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.classList.add('mobile-active');
             document.body.classList.add('menu-open');
             gsap.set(navItems, { opacity: 1 });
+            // Clear scroll-hide y offset so the overlay sits at its natural fixed position
+            gsap.set(navLinks, { y: 0 });
 
             activeTweens.push(gsap.to(navLinks, {
                 clipPath: 'inset(0% 0% 0% 0%)',
@@ -341,6 +361,10 @@ document.addEventListener('DOMContentLoaded', () => {
             menuToggle.classList.remove('active');
             document.body.classList.remove('menu-open');
             killActive();
+            // Restore scroll-hide state — if nav was hidden before menu opened, re-hide it
+            if (navIsHidden) {
+                gsap.set([header, navLinks], { y: -120 });
+            }
 
             navItems.forEach((el, i) => {
                 activeTweens.push(scrambleOut(el, i * 0.05));

@@ -37,6 +37,7 @@ button:focus-visible {
 
 html {
     scroll-behavior: auto;
+    background-color: #0e0e0e;
 }
 
 body {
@@ -345,8 +346,10 @@ header.scrolled {
     transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-body.header-scrolled .nav-links {
-    top: calc(1.5rem + env(safe-area-inset-top, 0px) + var(--header-height, 72px) / 2);
+@media (min-width: 993px) {
+    body.header-scrolled .nav-links {
+        top: calc(1.5rem + env(safe-area-inset-top, 0px) + var(--header-height, 72px) / 2);
+    }
 }
 
 .nav-meta {
@@ -1429,6 +1432,12 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     cursor: pointer;
     transition: background 160ms ease, color 160ms ease;
     padding: 0;
+}
+
+.testi-nav:active {
+    background: var(--text-color);
+    color: var(--bg-color);
+    transition: none;
 }
 
 @media (hover: hover) {
