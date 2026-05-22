@@ -152,9 +152,10 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 - No hover effects; images shown in full color (no grayscale filter)
 
 ### 2. Header & Landing Entrance Animations
-- Header: slides down from `-100%` y + fades in, duration 0.7s, `power3.out`, delay 0.1s
-- `.nav-links` (desktop only, `min-width: 993px`): same slide-in as header — was implicit when nav lived inside `<header>`, made explicit after the iOS fix moved it to a direct `<body>` child
-- `.menu-toggle`: fades up from `y: 30`, duration 0.5s, delay 0.8s, `clearProps: 'transform'` — required to restore CSS `transform: translateX(-50%)` centering after GSAP finishes
+- **Flash prevention**: `<body style="opacity:0">` hides all content before first paint; `<html>` has `background-color: #0e0e0e` so the dark background shows through while body is transparent. At the very start of `DOMContentLoaded`, JS sets `document.body.style.opacity = '1'` and immediately calls `gsap.set()` on every entrance element to place them at their "from" positions — all in one synchronous tick so the browser paints only once with elements already at their initial states. **Because of this, entrance animations use `gsap.to()` (not `gsap.from()`) — changing them back to `from()` would break the fix since GSAP would read opacity:0 as the target value.**
+- Header: slides in from `yPercent: -100, opacity: 0 → 0, 1`, duration 0.7s, `power3.out`, delay 0.1s
+- `.nav-links` (desktop only, `min-width: 993px`): same slide-in as header
+- `.menu-toggle`: fades up from `y: 30, opacity: 0 → 0, 1`, duration 0.5s, delay 0.8s, `clearProps: 'transform'` — required to restore CSS `transform: translateX(-50%)` centering after GSAP finishes
 - Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
 - `onComplete` on the entrance timeline calls `startHeroIdleAnimations()`
 
@@ -168,6 +169,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - Uses GSAP (not CSS transitions) so both elements are on the same frame — avoids the pill-before-text timing mismatch that CSS transitions produce (header is sticky/no base transform; `.nav-links` has `translate(-50%,-50%)` — compositing order differs)
 - `navIsHidden` bool + `navPeakY` guard re-triggering; `overwrite: true` cancels in-progress tweens
 - **30px hysteresis**: once hidden, `navPeakY` tracks the furthest scroll position reached (updates on every frame while nav is hidden). Nav reappears only when `navPeakY - scrollY > 30`. Using the rolling peak (not the position where nav first hid) means the 30px is always measured from the most recent scroll peak — prevents jitter without requiring a full scroll back to the original hide point
+- **Frozen while menu is open**: entire scroll-hide block (including `header.scrolled` / `body.header-scrolled` class toggles) is skipped when `body.menu-open` is set — prevents the pill transition and `body.header-scrolled .nav-links` top-offset from shifting the mobile overlay mid-scroll
 - `.menu-toggle` (mobile hamburger) is intentionally unaffected — it's a separate `position: fixed` element
 
 ### 3. `updateNavDateTime()` — Live Clock
@@ -205,6 +207,9 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 ### 10. Hamburger Menu
 - Toggle `.menu-toggle` adds/removes `.active` (animates spans to X) and `.mobile-active` on `.nav-links`
 - Also toggles `menu-open` on `<body>` (disables `mix-blend-mode: difference` on header)
+- **On open**: `gsap.set(navLinks, { y: 0 })` clears any scroll-hide `y` offset so the overlay sits at its natural fixed position regardless of scroll state
+- **On close**: if `navIsHidden` is true, immediately `gsap.set([header, navLinks], { y: -120 })` to restore the hidden state before the scroll handler resumes
+- `body.header-scrolled .nav-links` (the top-offset rule for the scrolled pill) is scoped to `@media (min-width: 993px)` — the mobile overlay's `top: -200px` overshoot must never be overridden by scroll state
 
 ### 11. Feature Image/Placeholder Reveal
 - Loops over every `.feature-img-wrap` at `DOMContentLoaded`
