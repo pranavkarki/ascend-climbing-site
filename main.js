@@ -382,4 +382,176 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.delayedCall(2.5, bounceCir);
 
     }
+
+    // ─── TESTIMONIALS CAROUSEL ──────────────────────────
+    (function initTestimonialsCarousel() {
+        function timeAgo(dateStr) {
+            const then = new Date(dateStr);
+            const now = new Date();
+            const weeks = Math.floor((now - then) / (7 * 24 * 60 * 60 * 1000));
+            if (weeks < 52) return `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
+            const months = Math.floor((now - then) / (30.4375 * 24 * 60 * 60 * 1000));
+            return `${months} month${months !== 1 ? 's' : ''} ago`;
+        }
+
+        const REVIEWS = [
+            {
+                name: 'Vivek Badu', stars: 5, date: '2025-06-20',
+                parts: [
+                    { t: '“This ' },
+                    { d: 'sparkle', t: 'mighty' },
+                    { t: ' wall offers ' },
+                    { d: 'pill', t: 'extraordinary' },
+                    { t: ' climbing & bouldering, probably the ' },
+                    { d: 'oval', t: 'best' },
+                    { t: ' in the capital.”' },
+                ],
+            },
+            {
+                name: 'Simone Alexander', stars: 5, date: '2025-07-04',
+                parts: [
+                    { t: '“Great place for kids ' },
+                    { d: 'underline', t: 'and adults' },
+                    { t: ' alike. ' },
+                    { d: 'pill', t: 'Super high quality' },
+                    { t: ' wall, plus a ' },
+                    { d: 'sparkle', t: 'great' },
+                    { t: ' coffee & snack spot. We’ll ' },
+                    { d: 'outline', t: 'be back' },
+                    { t: '.”' },
+                ],
+            },
+            {
+                name: 'Ewen', stars: 5, date: '2026-02-13',
+                parts: [
+                    { t: '“I’ve tried both gyms in the city center, but this one’s ' },
+                    { d: 'pill', t: 'really worth' },
+                    { t: ' ' },
+                    { d: 'wave', t: 'the ride' },
+                    { t: ' to get there :)”' },
+                ],
+            },
+            {
+                name: 'Allen Maharjan', stars: 5, date: '2025-12-12',
+                parts: [
+                    { t: '“Staff are ' },
+                    { d: 'oval', t: 'super friendly' },
+                    { t: ' — a ' },
+                    { d: 'sparkle', t: 'great' },
+                    { t: ' place to hang with ' },
+                    { d: 'underline', t: 'friends & family' },
+                    { t: '.”' },
+                ],
+            },
+            {
+                name: 'Swostik Pokharel', stars: 5, date: '2025-08-08',
+                parts: [
+                    { t: '“So many ' },
+                    { d: 'pill', t: 'diverse' },
+                    { t: ' routes — and they ' },
+                    { d: 'outline', t: 'change them up' },
+                    { t: ' ' },
+                    { d: 'wave', t: 'every month' },
+                    { t: ' or so.”' },
+                ],
+            },
+            {
+                name: 'Puntarika Tunyavanich', stars: 4, date: '2025-08-29',
+                parts: [
+                    { t: '“The ' },
+                    { d: 'pill', t: 'new' },
+                    { t: ' climbing wall ' },
+                    { d: 'sparkle', t: 'in Nepal' },
+                    { t: '!”' },
+                ],
+            },
+        ];
+
+        const quoteEl  = document.getElementById('testi-quote');
+        const attribEl = document.getElementById('testi-attrib');
+        const counterEl = document.getElementById('testi-counter');
+        const dotsEl   = document.getElementById('testi-dots');
+        if (!quoteEl || !attribEl || !dotsEl) return;
+
+        const CLASS_MAP = { pill: 't-pill', outline: 't-outline', oval: 't-oval', sparkle: 't-sparkle', wave: 't-wave', underline: 't-underline' };
+        let current = 0;
+        let autoTimer = null;
+
+        function renderQuote(r) {
+            quoteEl.innerHTML = r.parts.map(p =>
+                p.d ? `<span class="${CLASS_MAP[p.d] || ''}">${p.t}</span>` : p.t
+            ).join('');
+        }
+
+        function renderAttrib(r) {
+            let starsHtml = '';
+            for (let i = 0; i < 5; i++) {
+                starsHtml += `<span style="opacity:${i < r.stars ? 1 : 0.2}">*</span>`;
+            }
+            attribEl.innerHTML =
+                `<span class="testi-attrib-dash"></span>` +
+                `<span class="testi-attrib-name">${r.name}</span>` +
+                `<span class="testi-attrib-stars">${starsHtml}</span>` +
+                `<span class="testi-attrib-when">via Google · ${timeAgo(r.date)}</span>`;
+        }
+
+        function renderDots() {
+            dotsEl.innerHTML = REVIEWS.map((_, i) =>
+                `<button class="testi-dot${i === current ? ' active' : ''}" data-i="${i}" aria-label="Review ${i + 1}"></button>`
+            ).join('');
+            dotsEl.querySelectorAll('.testi-dot').forEach(btn => {
+                btn.addEventListener('click', () => goTo(+btn.dataset.i));
+            });
+        }
+
+        function updateDots() {
+            dotsEl.querySelectorAll('.testi-dot').forEach((btn, i) => {
+                btn.classList.toggle('active', i === current);
+            });
+        }
+
+        function goTo(idx, skipFade) {
+            current = ((idx % REVIEWS.length) + REVIEWS.length) % REVIEWS.length;
+
+            if (!skipFade) {
+                quoteEl.style.transition = 'none';
+                quoteEl.style.opacity = '0';
+                quoteEl.style.transform = 'translateY(7px)';
+            }
+
+            renderQuote(REVIEWS[current]);
+            renderAttrib(REVIEWS[current]);
+            counterEl.textContent = `[${String(current + 1).padStart(2, '0')} / ${String(REVIEWS.length).padStart(2, '0')}]`;
+
+            if (!skipFade) {
+                requestAnimationFrame(() => {
+                    quoteEl.style.transition = 'opacity 550ms cubic-bezier(0.16, 1, 0.3, 1), transform 550ms cubic-bezier(0.16, 1, 0.3, 1)';
+                    quoteEl.style.opacity = '1';
+                    quoteEl.style.transform = 'translateY(0)';
+                    updateDots();
+                });
+            } else {
+                updateDots();
+            }
+
+            clearInterval(autoTimer);
+            autoTimer = setInterval(() => goTo(current + 1), 8000);
+        }
+
+        document.getElementById('testi-prev')?.addEventListener('click', () => goTo(current - 1));
+        document.getElementById('testi-next')?.addEventListener('click', () => goTo(current + 1));
+
+        document.addEventListener('keydown', e => {
+            const section = document.getElementById('testimonials');
+            if (!section) return;
+            const rect = section.getBoundingClientRect();
+            if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+            if (e.key === 'ArrowLeft') goTo(current - 1);
+            if (e.key === 'ArrowRight') goTo(current + 1);
+        });
+
+        renderDots();
+        goTo(0, true);
+    })();
+
 });
