@@ -22,7 +22,7 @@ All three loaded via CDN in that order. Local font: `fonts/Gandur New-Light.otf`
 
 | File | What it is |
 |------|------------|
-| `index.html` | Main page (landing, pricing, courses, features, footer) |
+| `index.html` | Main page (landing, pricing, courses, features, testimonials, footer) |
 | `cafe.html` | Cafe menu page |
 | `styles.css` | All styles |
 | `main.js` | All JS |
