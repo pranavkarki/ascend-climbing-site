@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const landingEl = document.getElementById('landing');
     let lastScrollY = window.scrollY;
     let navIsHidden = false;
-    let navHiddenAtY = 0;
+    let navPeakY = 0;
 
     const onScroll = () => {
         const scrollY = window.scrollY;
@@ -146,11 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!navIsHidden && pastLanding && scrollY > lastScrollY) {
                 navIsHidden = true;
-                navHiddenAtY = scrollY;
+                navPeakY = scrollY;
                 gsap.to([header, navLinksEl], { y: -120, duration: 0.4, ease: 'power3.in', overwrite: true });
-            } else if (navIsHidden && (!pastLanding || navHiddenAtY - scrollY > 30)) {
-                navIsHidden = false;
-                gsap.to([header, navLinksEl], { y: 0, duration: 0.45, ease: 'power3.out', overwrite: true });
+            } else if (navIsHidden) {
+                if (scrollY > navPeakY) navPeakY = scrollY;
+                if (!pastLanding || navPeakY - scrollY > 30) {
+                    navIsHidden = false;
+                    gsap.to([header, navLinksEl], { y: 0, duration: 0.45, ease: 'power3.out', overwrite: true });
+                }
             }
         }
         lastScrollY = scrollY;

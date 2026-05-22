@@ -166,8 +166,8 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 ### 2b. Scroll-Hide Navbar
 - After scrolling past `#landing` bottom: scrolling **down** fires `gsap.to([header, navLinksEl], { y: -120, ... })` on both elements simultaneously; scrolling **up** animates both back to `y: 0`
 - Uses GSAP (not CSS transitions) so both elements are on the same frame — avoids the pill-before-text timing mismatch that CSS transitions produce (header is sticky/no base transform; `.nav-links` has `translate(-50%,-50%)` — compositing order differs)
-- `navIsHidden` bool + `navHiddenAtY` guard re-triggering; `overwrite: true` cancels in-progress tweens
-- **30px hysteresis**: once hidden, nav only reappears after scrolling up ≥ 30px from the position where it hid (`navHiddenAtY - scrollY > 30`). Prevents Lenis micro-adjustments or carousel height changes from briefly registering as "scroll up" and flashing the nav
+- `navIsHidden` bool + `navPeakY` guard re-triggering; `overwrite: true` cancels in-progress tweens
+- **30px hysteresis**: once hidden, `navPeakY` tracks the furthest scroll position reached (updates on every frame while nav is hidden). Nav reappears only when `navPeakY - scrollY > 30`. Using the rolling peak (not the position where nav first hid) means the 30px is always measured from the most recent scroll peak — prevents jitter without requiring a full scroll back to the original hide point
 - `.menu-toggle` (mobile hamburger) is intentionally unaffected — it's a separate `position: fixed` element
 
 ### 3. `updateNavDateTime()` — Live Clock
