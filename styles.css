@@ -1368,7 +1368,6 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     opacity: 0.35;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    width: 100%;
 }
 
 /* ── Footer row: counter + controls ── */
@@ -1432,9 +1431,11 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     padding: 0;
 }
 
-.testi-nav:hover {
-    background: var(--text-color);
-    color: var(--bg-color);
+@media (hover: hover) {
+    .testi-nav:hover {
+        background: var(--text-color);
+        color: var(--bg-color);
+    }
 }
 
 /* ── Responsive ── */
@@ -1452,6 +1453,9 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+    .testi-attrib-when {
+        width: 100%;
     }
 }
 
