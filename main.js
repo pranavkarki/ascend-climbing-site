@@ -442,119 +442,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${months} month${months !== 1 ? 's' : ''} ago`;
         }
 
-        const REVIEWS = [
-            {
-                name: 'Vivek Badu', stars: 5, date: '2025-06-20',
-                parts: [
-                    { t: '“This ' },
-                    { d: 'sparkle', t: 'mighty' },
-                    { t: ' wall offers ' },
-                    { d: 'pill', t: 'extraordinary' },
-                    { t: ' climbing & bouldering, probably the ' },
-                    { d: 'oval', t: 'best' },
-                    { t: ' in the capital.”' },
-                ],
-            },
-            {
-                name: 'Simone Alexander', stars: 5, date: '2025-07-04',
-                parts: [
-                    { t: '“Great place for kids ' },
-                    { d: 'underline', t: 'and adults' },
-                    { t: ' alike. ' },
-                    { d: 'pill', t: 'Super high quality' },
-                    { t: ' wall, plus a ' },
-                    { d: 'sparkle', t: 'great' },
-                    { t: ' coffee & snack spot. We’ll ' },
-                    { d: 'outline', t: 'be back' },
-                    { t: '.”' },
-                ],
-            },
-            {
-                name: 'Ewen', stars: 5, date: '2026-02-13',
-                parts: [
-                    { t: '“I’ve tried both gyms in the city center, but this one’s ' },
-                    { d: 'pill', t: 'really worth' },
-                    { t: ' ' },
-                    { d: 'wave', t: 'the ride' },
-                    { t: ' to get there :)”' },
-                ],
-            },
-            {
-                name: 'Allen Maharjan', stars: 5, date: '2025-12-12',
-                parts: [
-                    { t: '“Staff are ' },
-                    { d: 'oval', t: 'super friendly' },
-                    { t: ' — a ' },
-                    { d: 'sparkle', t: 'great' },
-                    { t: ' place to hang with ' },
-                    { d: 'underline', t: 'friends & family' },
-                    { t: '.”' },
-                ],
-            },
-            {
-                name: 'Swostik Pokharel', stars: 5, date: '2025-08-08',
-                parts: [
-                    { t: '“So many ' },
-                    { d: 'pill', t: 'diverse' },
-                    { t: ' routes — and they ' },
-                    { d: 'outline', t: 'change them up' },
-                    { t: ' ' },
-                    { d: 'wave', t: 'every month' },
-                    { t: ' or so.”' },
-                ],
-            },
-            {
-                name: 'Puntarika Tunyavanich', stars: 4, date: '2025-08-29',
-                parts: [
-                    { t: '“The ' },
-                    { d: 'pill', t: 'new' },
-                    { t: ' climbing wall ' },
-                    { d: 'sparkle', t: 'in Nepal' },
-                    { t: '!”' },
-                ],
-            },
-        ];
-
         const quoteEl  = document.getElementById('testi-quote');
         const attribEl = document.getElementById('testi-attrib');
         const counterEl = document.getElementById('testi-counter');
         const dotsEl   = document.getElementById('testi-dots');
         if (!quoteEl || !attribEl || !dotsEl) return;
 
-        const CLASS_MAP = { pill: 't-pill', outline: 't-outline', oval: 't-oval', sparkle: 't-sparkle', wave: 't-wave', underline: 't-underline' };
+        const slides       = Array.from(quoteEl.querySelectorAll('.testi-slide'));
+        const attribSlides = Array.from(attribEl.querySelectorAll('.testi-attrib-slide'));
+        const total = slides.length;
         let current = 0;
         let autoTimer = null;
 
-        // Measure max height across all slides and lock min-height to prevent layout shifts
-        quoteEl.style.visibility = 'hidden';
-        let maxQuoteH = 0;
-        for (const r of REVIEWS) {
-            renderQuote(r);
-            maxQuoteH = Math.max(maxQuoteH, quoteEl.scrollHeight);
-        }
-        quoteEl.style.visibility = '';
-        quoteEl.style.minHeight = maxQuoteH + 'px';
-
-        function renderQuote(r) {
-            quoteEl.innerHTML = r.parts.map(p =>
-                p.d ? `<span class="${CLASS_MAP[p.d] || ''}">${p.t}</span>` : p.t
-            ).join('');
-        }
-
-        function renderAttrib(r) {
-            let starsHtml = '';
-            for (let i = 0; i < 5; i++) {
-                starsHtml += `<span style="opacity:${i < r.stars ? 1 : 0.2}">*</span>`;
-            }
-            attribEl.innerHTML =
-                `<span class="testi-attrib-dash"></span>` +
-                `<span class="testi-attrib-name">${r.name}</span>` +
-                `<span class="testi-attrib-stars">${starsHtml}</span>` +
-                `<span class="testi-attrib-when">via Google · ${timeAgo(r.date)}</span>`;
-        }
+        // Update relative timestamps from data-date attributes
+        attribEl.querySelectorAll('.testi-attrib-when[data-date]').forEach(el => {
+            el.textContent = `via Google · ${timeAgo(el.dataset.date)}`;
+        });
 
         function renderDots() {
-            dotsEl.innerHTML = REVIEWS.map((_, i) =>
+            dotsEl.innerHTML = slides.map((_, i) =>
                 `<button class="testi-dot${i === current ? ' active' : ''}" data-i="${i}" aria-label="Review ${i + 1}"></button>`
             ).join('');
             dotsEl.querySelectorAll('.testi-dot').forEach(btn => {
@@ -568,29 +474,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        function goTo(idx, skipFade) {
-            current = ((idx % REVIEWS.length) + REVIEWS.length) % REVIEWS.length;
+        function goTo(idx) {
+            slides[current].classList.remove('active');
+            slides[current].setAttribute('aria-hidden', 'true');
+            attribSlides[current].classList.remove('active');
+            attribSlides[current].setAttribute('aria-hidden', 'true');
 
-            if (!skipFade) {
-                quoteEl.style.transition = 'none';
-                quoteEl.style.opacity = '0';
-                quoteEl.style.transform = 'translateY(7px)';
-            }
+            current = ((idx % total) + total) % total;
 
-            renderQuote(REVIEWS[current]);
-            renderAttrib(REVIEWS[current]);
-            counterEl.textContent = `[${String(current + 1).padStart(2, '0')} / ${String(REVIEWS.length).padStart(2, '0')}]`;
+            slides[current].classList.add('active');
+            slides[current].removeAttribute('aria-hidden');
+            attribSlides[current].classList.add('active');
+            attribSlides[current].removeAttribute('aria-hidden');
 
-            if (!skipFade) {
-                requestAnimationFrame(() => {
-                    quoteEl.style.transition = 'opacity 550ms cubic-bezier(0.16, 1, 0.3, 1), transform 550ms cubic-bezier(0.16, 1, 0.3, 1)';
-                    quoteEl.style.opacity = '1';
-                    quoteEl.style.transform = 'translateY(0)';
-                    updateDots();
-                });
-            } else {
-                updateDots();
-            }
+            counterEl.textContent = `[${String(current + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}]`;
+            updateDots();
 
             clearInterval(autoTimer);
             autoTimer = setInterval(() => goTo(current + 1), 8000);
@@ -609,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         renderDots();
-        goTo(0, true);
+        autoTimer = setInterval(() => goTo(current + 1), 8000);
     })();
 
 });
