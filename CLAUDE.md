@@ -89,7 +89,7 @@ CDN script order in HTML (order matters):
 ### Special Effects
 - **Noise overlay**: SVG fractalNoise on `body::after`, `opacity: 0.08`, fixed, `z-index: 9999`, `pointer-events: none`
 - **Navbar**: `mix-blend-mode: difference` on `<header>` so white text inverts against page content. Links: Index | Pricing | Activities | Features | About. `.nav-meta` (right side) contains both `#nav-datetime` and `.nav-location` in a flex row
-- **Link hover**: blue `clip-path` fill slides up from bottom + scramble text effect (JS)
+- **Link hover**: blue `clip-path` fill slides up from bottom + scramble text effect (JS). `--link-highlight` is overridden to `#FAFAFA` on `header.scrolled` and `body.header-scrolled .nav-links` only — scoped to nav, not the whole body, so links elsewhere (e.g. `.grb-link` Google badge) keep the blue fill
 - **`body` uses `overflow-x: clip`** (not `hidden`) — prevents horizontal scroll without creating a scroll container that would clip child `overflow: visible` (e.g. SVG animations)
 
 ---
@@ -120,9 +120,10 @@ CDN script order in HTML (order matters):
 | `.feature-item` | Flex column wrapper for one feature subsection (index label + image + heading) |
 | `.feature-img-wrap` | Image container — `aspect-ratio: 4/3`, `overflow: hidden`, `background-color: #0000CD` (blue shows before reveal). Has an `img` for real photos, empty for placeholders |
 | `.feature-img-placeholder` | Added to `.feature-img-wrap` when no real image yet — overrides to `background-color: #000` (black), while `.feature-img-wrap` itself is blue (`#0000CD`) |
-| `.feature-item-info` | Heading area below image, `padding: 0.75rem 0` |
+| `.feature-item-info` | Heading area below image, `padding: 0.75rem 0`. Cafe item additionally has `.feature-item-desc` (muted description, `opacity: 0.55`) and `.feature-item-link` (inline-block link to `cafe.html`) |
 | `.feature-index` | `[001]` / `[002]` / `[003]` label placed directly above a heading — green `#39FF14`, monospace, `letter-spacing: 0.1em`, `display: block`, `margin-bottom: 0.5rem`. Used in Features (above each feature image) and in Pricing/Activities (above each subsection `h3`). Numbering restarts at `[001]` per section. |
-| `.pricing-label`, `.activities-label`, `.features-label` | Green `#39FF14` inline label spans inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em`. No space character before the span in HTML — gap is controlled purely by `margin-left`. |
+| `.section-heading-text` | Wraps the main text inside each section `h2` (Pricing, Activities, Features). **Required** — SplitType targets this span (not the whole h2) so char spans nest inside it rather than becoming direct flex children. Also has global `font-size: inherit; font-weight: inherit` to counteract the `span { font-size: 14px }` reset. |
+| `.section-label` | Green `#39FF14` inline label span inside each section `h2` (e.g. `[PRICING]`, `[COURSES/TRIPS]`, `[FEATURES]`). Inconsolata, weight 400, `letter-spacing: 0.1em`, `margin-left: 1.8em` on desktop. On mobile (≤992px): `order: -1` inside flex h2 so it appears above the heading text; `margin-left: 0`, `font-size: 13px`. No space character before the span in HTML — gap controlled by `margin-left`. |
 | `#testimonials` | Section between Features and Footer. Contains eyebrow + section title (`.testi-title-main` Inconsolata + `.testi-title-serif` Newsreader italic green) and the featured carousel. `padding-top: var(--section-pt)` |
 | `.testi-carousel-wrap` | Direct child of `.grid-container` in `#testimonials`. Has `border-top` hairline. Children: `.testi-quote`, `.testi-attrib`, `.testi-footer-row` |
 | `.testi-quote` | Big decorated quote block — Inconsolata, `clamp(20px, 2.6vw, 38px)`. Content populated by JS. `min-height` is set dynamically by JS on init (tallest slide measured invisibly) — do not rely on the CSS `min-height: 6.5em` fallback for layout stability. `transition: opacity, transform` used for carousel fade |
@@ -184,7 +185,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 ### 6. Section Header Cinematic Reveal (`cinematicCharReveal`)
 - Applied to `#pricing-section-header`, `#activities-section-header`, and `#features-section-header`
-- Each `h2` is split with **SplitType** into `.chars`
+- SplitType targets the **`.section-heading-text` child span** (not the whole `h2`) — this keeps char spans nested inside the wrapper so they don't become direct flex children of the mobile-flex h2 (which would stack them one-per-line)
 - Each char: blurs in (`blur(20px) → 0`) on scroll-in, then flickers green (`#39FF14` glow) and resolves to `color: inherit`
 - Random per-char delay (up to 0.4s × `Math.random()`), `toggleActions: "play none none reverse"`
 - Skipped if `prefers-reduced-motion` or SplitType not loaded
@@ -236,7 +237,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 
 ## Responsive Breakpoints
 
-- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`. `h3` → 28px, `h4` → 20px, `.pass-price` → 20px, `.membership-row-item` → 20px/32px line-height (matches `h4`). `.subsection-break` border suppressed on mobile (spacing only). First `.pricing-pass-card` and `.course-cards-row` card have `border-top: none` to avoid a line directly under subsection headings.
+- **≤ 992px**: Single-column grid, mobile fullscreen nav overlay, sticky becomes relative for courses, `.col-2` hidden in landing, `h1` scales with `clamp`. `h3` → 28px, `h4` → 20px, `.pass-price` → 20px, `.membership-row-item` → 20px/32px line-height (matches `h4`). `.subsection-break` border suppressed on mobile (spacing only). First `.pricing-pass-card` and `.course-cards-row` card have `border-top: none` to avoid a line directly under subsection headings. Section `h2`s become `display: flex; flex-direction: column` — `.section-label` gets `order: -1` to appear above the heading text.
 - **≤ 480px**: Logo size reduction only
 
 ---
