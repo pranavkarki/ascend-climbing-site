@@ -154,8 +154,11 @@ All code runs inside `DOMContentLoaded`. GSAP plugin registered at top: `gsap.re
 
 ### 2. Header & Landing Entrance Animations
 - **Flash prevention**: `<body style="opacity:0">` hides all content before first paint; `<html>` has `background-color: #0e0e0e` so the dark background shows through while body is transparent. At the very start of `DOMContentLoaded`, JS sets `document.body.style.opacity = '1'` and immediately calls `gsap.set()` on every entrance element to place them at their "from" positions — all in one synchronous tick so the browser paints only once with elements already at their initial states. **Because of this, entrance animations use `gsap.to()` (not `gsap.from()`) — changing them back to `from()` would break the fix since GSAP would read opacity:0 as the target value.**
-- Header: slides in from `yPercent: -100, opacity: 0 → 0, 1`, duration 0.7s, `power3.out`, delay 0.1s
-- `.nav-links` (desktop only, `min-width: 993px`): same slide-in as header
+- Header + nav-links share a single `gsap.timeline({ delay: 0.1 })` so both tween on identical frames (standalone tweens with the same delay can drift by one frame, which read as a subtle lag). The header tween is added at position `0`, and the nav-links tween (desktop only) is also added at position `0`. The timeline's `onComplete` sets `entranceDone = true` and snaps scroll classes
+- Header: slides in from `yPercent: -100, opacity: 0 → 0, 1`, duration 0.7s, `power3.out`
+- `.nav-links` (desktop only, `min-width: 993px`): slides in from `yPercent: -250 → -50` with `xPercent: -50` held throughout. Duration 0.7s, ease `power3.out`, delay 0.1. Two constraints have to be satisfied at the same time:
+  1. `xPercent: -50` (and yPercent ending at -50, not 0) keeps GSAP's inline transform compatible with the CSS `translate(-50%, -50%)` centering — without it, the pill is positioned by its top-left corner during the tween and snaps horizontally at the end when `clearProps` restores the CSS.
+  2. The yPercent delta is **-200** (250 → 50), which equals ~80px on the ~40px-tall pill — that matches the header's 72px pixel travel so per-pixel velocity is parallel. Setting yPercent delta to just `-100` (one element-height) makes the pill move at roughly half the header's velocity and feels laggy relative to the brand/date/location text even at the same duration.
 - `.menu-toggle`: fades up from `y: 30, opacity: 0 → 0, 1`, duration 0.5s, delay 0.8s, `clearProps: 'transform'` — required to restore CSS `transform: translateX(-50%)` centering after GSAP finishes
 - Landing content timeline (delay 0.5s): `.landing-geo` → `.landing-brand` → `.landing-climbing-sub` → `.landing-tagline`, each fading up sequentially with overlaps
 - `onComplete` on the entrance timeline calls `startHeroIdleAnimations()`
@@ -171,6 +174,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - `navIsHidden` bool + `navPeakY` guard re-triggering; `overwrite: true` cancels in-progress tweens
 - **30px hysteresis**: once hidden, `navPeakY` tracks the furthest scroll position reached (updates on every frame while nav is hidden). Nav reappears only when `navPeakY - scrollY > 30`. Using the rolling peak (not the position where nav first hid) means the 30px is always measured from the most recent scroll peak — prevents jitter without requiring a full scroll back to the original hide point
 - **Frozen while menu is open**: entire scroll-hide block (including `header.scrolled` / `body.header-scrolled` class toggles) is skipped when `body.menu-open` is set — prevents the pill transition and `body.header-scrolled .nav-links` top-offset from shifting the mobile overlay mid-scroll
+- **Frozen while overlay is closing too**: the scroll-hide tween block (but NOT the class toggles) is also skipped while `.nav-links` still has `mobile-active`. `mobile-active` is only removed in the close tween's `onComplete`, so it stays present during the wipe. Otherwise tapping a mobile anchor link triggers an immediate scroll → onScroll → scroll-hide `gsap.to([header, navLinks], { y: -120, overwrite: true })`, which **kills the in-flight clip-path close tween** and leaves the grey overlay frozen on screen
 - `.menu-toggle` (mobile hamburger) is intentionally unaffected — it's a separate `position: fixed` element
 
 ### 3. `updateNavDateTime()` — Live Clock
@@ -209,7 +213,7 @@ Fires after the entrance timeline completes. Skipped if `prefers-reduced-motion`
 - Toggle `.menu-toggle` adds/removes `.active` (animates spans to X) and `.mobile-active` on `.nav-links`
 - Also toggles `menu-open` on `<body>` (disables `mix-blend-mode: difference` on header)
 - **On open**: `gsap.set(navLinks, { y: 0 })` clears any scroll-hide `y` offset so the overlay sits at its natural fixed position regardless of scroll state
-- **On close**: if `navIsHidden` is true, immediately `gsap.set([header, navLinks], { y: -120 })` to restore the hidden state before the scroll handler resumes
+- **On close**: if `navIsHidden` is true, the `gsap.set([header, navLinks], { y: -120 })` to restore the hidden state runs in the `onComplete` of the close clip-path tween — NOT immediately. Restoring it before the overlay has finished closing causes the still-visible overlay to snap up 120px mid-close (only noticeable when the menu was opened while scrolled past the hero, since `navIsHidden` is false at the top of the page)
 - `body.header-scrolled .nav-links` (the top-offset rule for the scrolled pill) is scoped to `@media (min-width: 993px)` — the mobile overlay's `top: -200px` overshoot must never be overridden by scroll state
 
 ### 11. Feature Image/Placeholder Reveal

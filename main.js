@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.set('.landing-climbing-sub',{ y: 20, opacity: 0 });
     gsap.set('.landing-tagline',     { y: 15, opacity: 0 });
     if (window.matchMedia('(min-width: 993px)').matches) {
-        gsap.set('.nav-links', { yPercent: -100, opacity: 0 });
+        // xPercent: -50 preserves CSS translate(-50%, ...) horizontal centering
+        // (avoids end-of-tween horizontal snap). yPercent: -250 = -50 (CSS center)
+        // + -200 extra: 200% of the pill's own ~40px height ≈ header's 72px travel,
+        // so per-pixel velocity matches the header at the same 0.7s duration.
+        gsap.set('.nav-links', { xPercent: -50, yPercent: -250, opacity: 0 });
     }
 
     const ST_PLAY_REVERSE = (trigger) => ({ trigger, start: 'top 85%', toggleActions: 'play none none reverse' });
@@ -148,10 +152,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastScrollY = window.scrollY;
     let navIsHidden = false;
     let navPeakY = 0;
+    let entranceDone = false;
 
     const onScroll = () => {
         const scrollY = window.scrollY;
         const menuIsOpen = document.body.classList.contains('menu-open');
+        // True while the mobile overlay is open OR in the middle of its close wipe
+        // (mobile-active is only removed in the close tween's onComplete). Used to
+        // prevent the scroll-hide tween's overwrite:true from killing the in-flight
+        // close clip-path animation when an anchor link triggers an immediate scroll.
+        const overlayBusy = navLinksEl && navLinksEl.classList.contains('mobile-active');
 
         if (!menuIsOpen) {
             const scrolled = scrollY > CONFIG.SCROLL_THRESHOLD;
@@ -159,7 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.toggle('header-scrolled', scrolled);
         }
 
-        if (landingEl && !menuIsOpen) {
+        // Skip hide/reveal until the entrance animation completes — otherwise
+        // the browser's async scroll-position restoration on mid-page refresh
+        // fires onScroll while yPercent is still animating, and overwrite:true
+        // kills the entrance tween, leaving yPercent stuck at a partial value.
+        if (landingEl && !menuIsOpen && !overlayBusy && entranceDone) {
             const pastLanding = scrollY > landingEl.offsetTop + landingEl.offsetHeight;
 
             if (!navIsHidden && pastLanding && scrollY > lastScrollY) {
@@ -178,9 +192,23 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    gsap.to(header, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
+    // Header + nav-links share a single timeline so both tween on identical frames.
+    // Standalone tweens with the same delay can drift by a frame; the timeline locks them together.
+    const navEntrance = gsap.timeline({
+        delay: 0.1,
+        onComplete: () => {
+            entranceDone = true;
+            lastScrollY = window.scrollY;
+
+            // Snap scroll classes to their correct state after entrance.
+            const scrolled = window.scrollY > CONFIG.SCROLL_THRESHOLD;
+            header.classList.toggle('scrolled', scrolled);
+            document.body.classList.toggle('header-scrolled', scrolled);
+        }
+    });
+    navEntrance.to(header, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
     if (window.matchMedia(`(min-width: ${CONFIG.MOBILE_BREAKPOINT + 1}px)`).matches) {
-        gsap.to('.nav-links', { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', delay: 0.1, clearProps: 'transform,opacity' });
+        navEntrance.to('.nav-links', { xPercent: -50, yPercent: -50, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
     }
     gsap.to('.menu-toggle', { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
 
@@ -362,10 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
             menuToggle.classList.remove('active');
             document.body.classList.remove('menu-open');
             killActive();
-            // Restore scroll-hide state — if nav was hidden before menu opened, re-hide it
-            if (navIsHidden) {
-                gsap.set([header, navLinks], { y: -120 });
-            }
 
             navItems.forEach((el, i) => {
                 activeTweens.push(scrambleOut(el, i * 0.05));
@@ -377,7 +401,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 0.5,
                 ease: 'power3.in',
                 delay: closeDelay,
-                onComplete: () => navLinks.classList.remove('mobile-active')
+                onComplete: () => {
+                    navLinks.classList.remove('mobile-active');
+                    // Restore scroll-hide state only AFTER the overlay has fully
+                    // closed — otherwise the still-visible overlay snaps up 120px.
+                    if (navIsHidden) {
+                        gsap.set([header, navLinks], { y: -120 });
+                    }
+                }
             }));
         }
 
@@ -475,25 +506,50 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const FADE_MS = 220;
+
         function goTo(idx) {
-            slides[current].classList.remove('active');
-            slides[current].setAttribute('aria-hidden', 'true');
-            attribSlides[current].classList.remove('active');
-            attribSlides[current].setAttribute('aria-hidden', 'true');
+            const next = ((idx % total) + total) % total;
+            if (next === current) return;
 
-            current = ((idx % total) + total) % total;
+            // Fade out containers
+            quoteEl.style.transition  = `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`;
+            attribEl.style.transition = `opacity ${FADE_MS}ms ease`;
+            quoteEl.style.opacity     = '0';
+            quoteEl.style.transform   = 'translateY(6px)';
+            attribEl.style.opacity    = '0';
 
-            slides[current].classList.add('active');
-            slides[current].removeAttribute('aria-hidden');
-            attribSlides[current].classList.add('active');
-            attribSlides[current].removeAttribute('aria-hidden');
+            setTimeout(() => {
+                slides[current].classList.remove('active');
+                slides[current].setAttribute('aria-hidden', 'true');
+                attribSlides[current].classList.remove('active');
+                attribSlides[current].setAttribute('aria-hidden', 'true');
 
-            counterEl.textContent = `[${String(current + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}]`;
-            updateDots();
+                current = next;
+
+                slides[current].classList.add('active');
+                slides[current].removeAttribute('aria-hidden');
+                attribSlides[current].classList.add('active');
+                attribSlides[current].removeAttribute('aria-hidden');
+
+                counterEl.textContent = `[${String(current + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}]`;
+                updateDots();
+
+                // Fade in containers
+                quoteEl.style.opacity   = '1';
+                quoteEl.style.transform = 'translateY(0)';
+                attribEl.style.opacity  = '1';
+            }, FADE_MS + 30);
 
             clearInterval(autoTimer);
             autoTimer = setInterval(() => goTo(current + 1), 8000);
         }
+
+        // Lock container height to tallest slide so nothing below shifts
+        requestAnimationFrame(() => {
+            const qh = quoteEl.offsetHeight;
+            if (qh > 0) quoteEl.style.minHeight = qh + 'px';
+        });
 
         document.getElementById('testi-prev')?.addEventListener('click', () => goTo(current - 1));
         document.getElementById('testi-next')?.addEventListener('click', () => goTo(current + 1));
