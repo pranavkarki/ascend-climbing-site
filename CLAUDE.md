@@ -1,6 +1,6 @@
 # Ascend Climbing — Project Context
 
-Static marketing site for **Ascend Climbing**, a bouldering/climbing gym in Jhamsikhel, Lalitpur, Nepal (owner: ASCE Pvt. Ltd.). Pure HTML + CSS + JS — **no build system, no npm, no bundler**. Deployed on Vercel (`vercel.json` → `cleanUrls: true`). Domain not yet acquired.
+Static marketing site for **Ascend Climbing**, a bouldering/climbing gym in Jhamsikhel, Lalitpur, Nepal (owner: ASCE Pvt. Ltd.). Pure HTML + CSS + JS — **no build system, no npm, no bundler**. Deployed on Vercel (`vercel.json` → `cleanUrls: true`). Live at **thesouthwall.com** (GoDaddy domain, DNS → Vercel).
 
 This file is a **map**. The detailed "why" behind tricky animation/layout decisions lives in inline comments next to the code — read those before changing tuned values.
 
@@ -10,12 +10,12 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Gym/Shower) → Testimonials → Footer |
+| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
 | `img/square/` | 9 photos (currently unused) |
-| `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif` |
+| `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif`, `rock-day.avif` (Rock Day section), `training-room.avif` |
 | `img/site-favicon.svg` | Favicon (white circle + dark star) |
 | `fonts/Gandur New-Light.otf` | Local brand display font |
 | `ref/` | Course images, logo, reference screenshots |
@@ -71,6 +71,15 @@ Aesthetic: brutalist/minimal, dark, monospace.
 
 - **≤992px**: single-column grid; mobile fullscreen nav overlay; sticky course cards → relative; landing `.col-2` hidden; section `<h2>` → flex-column with `.section-label` ordered above the heading.
 - **≤480px**: minor logo/size tweaks only.
+
+---
+
+## SEO
+
+- JSON-LD `SportsActivityLocation` schema in `<head>` of `index.html` — includes name, alternateName ("The South Wall"), address, exact GPS coords, phone, hours, amenities, and `sameAs` links (Facebook, Instagram, Google Business Profile).
+- Google Business Profile verified; website link submitted (pending approval).
+- Sitemap at `/sitemap.xml`; submit to Google Search Console at `thesouthwall.com`.
+- Phone: `+977-9764835306` · Hours: 8am–9pm daily, 8am–10pm Fridays.
 
 ---
 
