@@ -24,8 +24,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400&family=Bebas+Neue&family=Newsreader:ital,opsz,wght@1,6..72,500&display=swap" rel="stylesheet">
     <link rel="preload" href="fonts/Gandur New-Light.otf" as="font" type="font/otf" crossorigin>
     <link rel="apple-touch-icon" sizes="1024x1024" href="img/site-icon-1024x1024@1x.png">
+    <link rel="icon" href="img/site-favicon-32.png" type="image/png" sizes="32x32">
     <link rel="icon" href="img/site-favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsActivityLocation",
+      "name": "Ascend Climbing",
+      "alternateName": "The South Wall",
+      "description": "Bouldering and climbing gym in Jhamsikhel, Lalitpur. Day passes, memberships, kids and adult courses, cafe, and outdoor rock climbing trips.",
+      "url": "https://thesouthwall.com/",
+      "telephone": "+977-9764835306",
+      "priceRange": "NPR 900–52000",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Jhamsikhel",
+        "addressLocality": "Lalitpur",
+        "addressCountry": "NP"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 27.677584499021037,
+        "longitude": 85.30878792487454
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Sunday"],
+          "opens": "08:00",
+          "closes": "21:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Saturday",
+          "opens": "08:00",
+          "closes": "21:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": "Friday",
+          "opens": "08:00",
+          "closes": "22:00"
+        }
+      ],
+      "amenityFeature": [
+        { "@type": "LocationFeatureSpecification", "name": "Bouldering Wall", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Lead Climbing Wall", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Cafe", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Shower", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Shoe Rental", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Top-Rope Climbing", "value": true }
+      ],
+      "sameAs": [
+        "https://www.facebook.com/ascendclimbing.np",
+        "https://www.instagram.com/ascendclimbing.np/",
+        "https://share.google/nAzkVHtaqR0YEMyhw"
+      ]
+    }
+    </script>
 </head>
 
 <body style="opacity:0">
@@ -185,7 +242,7 @@
             <!-- Pricing Section Header -->
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading">
-                    <h2 id="pricing-section-header" class="pricing-section-header"><span class="section-heading-text">₹$€£¥</span><span class="section-label">[PRICING]</span></h2>
+                    <h2 id="pricing-section-header" class="pricing-section-header"><span class="section-heading-text">₹$€£¥</span><span class="section-label">[Pricing]</span></h2>
                 </div>
             </div>
             <!-- Day Passes Row -->
@@ -284,7 +341,7 @@
             <!-- Activities Section Header -->
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading">
-                    <h2 id="activities-section-header"><span class="section-heading-text">Activities</span><span class="section-label">[COURSES/TRIPS]</span></h2>
+                    <h2 id="activities-section-header"><span class="section-heading-text">Activities</span><span class="section-label">[Courses/Trips]</span></h2>
                 </div>
             </div>
 
@@ -346,16 +403,26 @@
                 </div>
             </div>
             <div class="grid-row rock-day-row scroll-section">
-                <div class="col-1 flex-col animate-up">
-                    <h4 class="rock-day-included-heading">What's Included—</h4>
-                    <ul class="perks-list">
-                        <li>Rock Level I certified guides</li>
-                        <li>Safety gear & first aid</li>
-                        <li>Food, snacks, hydration, transport</li>
-                        <li>Serene views and relaxing ambience</li>
-                    </ul>
+                <div class="col-1 feature-item">
+                    <div class="feature-img-wrap">
+                        <img src="img/optimized/rock-day.avif" alt="Rock Day outdoor climbing trip" loading="lazy">
+                    </div>
                 </div>
-                <div class="col-2 col-span-right animate-up delay-1">
+                <div class="col-2 flex-col animate-up">
+                    <p class="rock-day-desc">An outdoor climbing trip to the natural rock faces around Kathmandu Valley. Includes Rock Level I certified guides, safety gear & first aid, food, snacks, hydration, and transport — plus serene views and a relaxing ambience away from the gym.</p>
+                    <div class="membership-table">
+                        <div class="membership-table-header">
+                            <h4>Members—</h4>
+                            <p class="table-subtitle">Per Person</p>
+                        </div>
+                        <div class="membership-row-item">
+                            <span>4 Persons</span>
+                            <span class="pass-price">NPR 4,000</span>
+                        </div>
+                        <p class="rock-day-member-note">*group of 4 required. For a private climb of 1–3 persons, non-member rates apply.</p>
+                    </div>
+                </div>
+                <div class="col-3 animate-up delay-1">
                     <div class="membership-tables-wrapper">
                         <div class="membership-table">
                             <div class="membership-table-header">
@@ -379,18 +446,6 @@
                                 <span class="pass-price">NPR 36,000</span>
                             </div>
                         </div>
-
-                        <div class="membership-table">
-                            <div class="membership-table-header">
-                                <h4>Members—</h4>
-                                <p class="table-subtitle">Per Person</p>
-                            </div>
-                            <div class="membership-row-item">
-                                <span>4 Persons</span>
-                                <span class="pass-price">NPR 4,000</span>
-                            </div>
-                            <p class="rock-day-member-note">*group of 4 required. For a private climb of 1–3 persons, non-member rates apply.</p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -401,7 +456,7 @@
         <section id="features">
             <div class="grid-row heading-row scroll-section">
                 <div class="section-heading">
-                    <h2 id="features-section-header"><span class="section-heading-text">AMMENITIES</span><span class="section-label">[FEATURES]</span></h2>
+                    <h2 id="features-section-header"><span class="section-heading-text">Amenities</span><span class="section-label">[Features]</span></h2>
                 </div>
             </div>
 
@@ -422,13 +477,7 @@
                     <div class="feature-img-wrap" style="aspect-ratio: 1/1;"><img src="img/optimized/training-room.avif" alt="Training room at Ascend Climbing" loading="lazy"></div>
                     <div class="feature-item-info">
                         <h3>Training Room</h3>
-                    </div>
-                </div>
-                <div class="feature-item animate-up">
-                    <span class="feature-index">[003]</span>
-                    <div class="feature-img-wrap feature-img-placeholder"></div>
-                    <div class="feature-item-info">
-                        <h3>Shower</h3>
+                        <p class="feature-item-desc">Campus board, weights, and pull-up bars to build the strength your climbing demands. Includes shower access to freshen up after a hard session.</p>
                     </div>
                 </div>
             </div>
@@ -492,11 +541,12 @@
 
         <!-- Bottom bar -->
         <div class="footer-bottom-bar">
-            <span class="footer-bb-cell tagline">Climbing + Bouldering</span>
+            <span class="footer-bb-cell tagline">Climbing + Bouldering · Jhamsikhel, Lalitpur</span>
             <span class="footer-bb-cell">&copy; 2026 ASCE Pvt. Ltd.</span>
+            <span class="footer-bb-cell">Day pass from NPR 900</span>
             <span class="footer-bb-cell spacer"></span>
             <span class="footer-bb-cell spacer"></span>
-            <a class="footer-bb-cell" href="tel:+97714xxxxxxx">+977 14 XXX XXX</a>
+            <a class="footer-bb-cell" href="tel:+9779764835306">+977 976 483 5306</a>
             <a class="footer-bb-cell" href="mailto:hello@ascendclimbing.np">Email</a>
             <a class="footer-bb-cell" href="https://www.facebook.com/ascendclimbing.np" target="_blank" rel="noopener">Facebook</a>
             <a class="footer-bb-cell" href="https://www.instagram.com/ascendclimbing.np/" target="_blank" rel="noopener">Instagram</a>
