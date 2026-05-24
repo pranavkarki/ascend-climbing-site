@@ -459,7 +459,7 @@ header.scrolled .nav-brand:hover {
     font-size: 24px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.35em;
+    letter-spacing: 0.1em;
     color: var(--text-color);
     margin: 0;
     text-align: center;
