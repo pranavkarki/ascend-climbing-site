@@ -2,3 +2,4 @@
 *.af~lock~
 .agents/
 .gemini/
+.claude/

@@ -14,7 +14,7 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
-| `img/square/` | 9 photos for the preloader roulette |
+| `img/square/` | 9 photos (currently unused) |
 | `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif` |
 | `img/site-favicon.svg` | Favicon (white circle + dark star) |
 | `fonts/Gandur New-Light.otf` | Local brand display font |
@@ -56,7 +56,6 @@ Aesthetic: brutalist/minimal, dark, monospace.
 
 ## JS map (`main.js` — all inside `DOMContentLoaded`; `gsap.registerPlugin(ScrollTrigger)` at top)
 
-- `initPreloader(onComplete)` — fullscreen 3×3 image roulette, locks final order `[4,0,2,6,8,1,3,5,7]`, wipes up. **Defers** all scroll/image ScrollTriggers into `onComplete`. Respects `prefers-reduced-motion`.
 - Header + `.nav-links` share **one** entrance timeline (same frames). Scroll-hide navbar = GSAP `y` tween on both elements with 30px hysteresis; frozen while menu is open/closing.
 - `startHeroIdleAnimations()` — periodic triangle spin (`#geo-tri-a`) + circle bounce (`#geo-circle-tr`) on the landing SVG mark.
 - `updateNavDateTime()` — live `#nav-datetime` clock, `Asia/Kathmandu`.
