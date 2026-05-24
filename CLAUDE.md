@@ -10,7 +10,7 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → Footer |
+| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → About → Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
@@ -36,7 +36,7 @@ Aesthetic: brutalist/minimal, dark, monospace.
 
 `--bg-color #0e0e0e` · `--text-color #FAFAFA` · `--link-highlight #0000CD` (blue link-hover fill) · `--gutter 2vw` (site-wide page padding — change this one var to resize gutters) · `--header-height 72px` (also set live by JS) · `--line-color #FAFAFA` / `--line-thickness 0.5pt`. Accent green (labels, testimonial decorations): `#39FF14`.
 
-**Type scale**: h1 128px/500 · h2 96px/700 (section headers) · h3 clamp(24,3vw,32) (subsection) · h4 24px (sub-subsection) · body/p/li/a 14px/400. Mobile (≤992px): h3→28, h4→20.
+**Type scale**: h1 `clamp(72px,14vw,200px)`/300 Gandur New (`.landing-brand`, text: "ASCEND CLIMBING & BOULDERING.") · h2 96px/700 (section headers) · h3 clamp(24,3vw,32) (subsection) · h4 24px (sub-subsection) · body/p/li/a 14px/400. Mobile (≤992px): h3→28, h4→20.
 
 **Grid**: `.grid-container` (page gutters) → `.grid-row` (`repeat(3,1fr)`, gap 2rem) → `.col-1/.col-2/.col-3`. Modifiers: `.compact`, `.no-border`, `.heading-row`, `.subsection-break`.
 
@@ -49,6 +49,8 @@ Aesthetic: brutalist/minimal, dark, monospace.
 - Entrance animations use `gsap.to()`, **not** `gsap.from()` — body starts at `opacity:0` and JS pre-sets the "from" states in one sync tick to prevent a flash. See the comment at the top of `main.js`.
 - `body` uses `overflow-x: clip` (not `hidden`) so child `overflow: visible` (SVG animations) isn't clipped.
 - `.feature-index` green `[001]` labels restart numbering per section.
+- `id="about"` lives on the `<section>` before the footer, NOT on `<footer>` — the footer nav link `href="#about"` targets this section. Do not move it back to the footer.
+- `.about-body` — shared style for the About section paragraph and the Activities intro paragraph. Spans grid columns 1–2, uppercase, 14px, muted colour. Used as a direct child of `.grid-row`.
 - Scroll past 200px toggles **both** `header.scrolled` and `body.header-scrolled` (the latter scopes nav link-color since `.nav-links` lives outside the header).
 - iOS safe areas: mobile nav overlay uses a hardcoded `-200px` overshoot on all sides (not `env()`, which iOS PWA shortcuts cache as 0). Fixed/sticky edge elements add `env(safe-area-inset-*)`. Full rationale in `styles.css` comments.
 
