@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0e0e0e">
+    <meta name="description" content="Field Notes — dispatches from the wall. Events, stories, and rock day trip reports from Ascend Climbing in Jhamsikhel, Lalitpur.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Field Notes — Ascend Climbing">
+    <meta property="og:description" content="Dispatches from the wall. Events, stories, and rock day trip reports from Ascend Climbing.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thesouthwall.com/stories">
+    <meta property="og:image" content="https://thesouthwall.com/img/optimized/wall.jpg">
+    <meta property="og:site_name" content="Ascend Climbing">
+    <link rel="canonical" href="https://thesouthwall.com/stories">
+    <title>Field Notes — Ascend Climbing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400&family=Newsreader:ital,opsz,wght@1,6..72,500&display=swap" rel="stylesheet">
+    <link rel="preload" href="fonts/Gandur New-Light.otf" as="font" type="font/otf" crossorigin>
+    <link rel="apple-touch-icon" sizes="1024x1024" href="img/site-icon-1024x1024@1x.png">
+    <link rel="icon" href="img/site-favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="img/site-favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="stories.css">
+</head>
+
+<body style="opacity:0">
+
+    <!-- App root — entirely JS-rendered. No main site navbar on this page. -->
+    <div id="fn-app"></div>
+
+    <!-- CDN scripts — load order matters -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Data -->
+    <script src="posts.js"></script>
+
+    <script>
+    // =========================================================================
+    // STORIES PAGE — all logic in one DOMContentLoaded block
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // No main site navbar on this page — navigation lives in the sidebar dropdown.
+        document.body.style.opacity = '1';
+        document.documentElement.style.setProperty('--header-height', '0px');
+
+        // Lenis smooth scroll
+        const lenis = new Lenis({ lerp: 0.1 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+
+        // ─── STORIES APP ───────────────────────────────────────────────────
+
+        const app = document.getElementById('fn-app');
+
+        // State
+        let currentFilter = 'all';
+        let currentSort   = 'new';
+        let currentPostId = null;  // null = index view
+
+        // ── Helpers ──
+
+        function catClass(cat) {
+            return { event: 'fn-cat--event', story: 'fn-cat--story', rock: 'fn-cat--rock' }[cat] || '';
+        }
+
+        function imgTag(src, alt) {
+            if (!src) return '';
+            // Hide the parent .fn-thumb too when image 404s (avoids empty box on mobile)
+            return `<img src="${esc(src)}" alt="${esc(alt || '')}" loading="lazy"
+                        onerror="this.style.display='none';this.parentElement.style.display='none'">`;
+        }
+
+        function esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function sortedFiltered() {
+            const f = POST_FILTERS.find(x => x.id === currentFilter);
+            const list = POSTS.filter(f.match);
+            list.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return currentSort === 'new'
+                    ? parsePostDate(b.date) - parsePostDate(a.date)
+                    : parsePostDate(a.date) - parsePostDate(b.date);
+            });
+            return list;
+        }
+
+        function counts() {
+            const c = { all: POSTS.length };
+            POSTS.forEach(p => { c[p.cat] = (c[p.cat] || 0) + 1; });
+            return c;
+        }
+
+        // ── Build HTML pieces ──
+
+        const NAV_LINKS_HTML = `
+            <div class="fn-nav-dropdown">
+                <a href="index.html">← Ascend</a>
+                <a href="index.html#pricing">Pricing</a>
+                <a href="index.html#activities">Activities</a>
+                <a href="index.html#features">Features</a>
+                <a href="index.html#about">About</a>
+            </div>
+        `;
+
+        function buildSidebarIndex() {
+            const c = counts();
+            const pillsHtml = POST_FILTERS.map(f => `
+                <button class="fn-pill${currentFilter === f.id ? ' active' : ''}" data-filter="${esc(f.id)}">
+                    <span class="fn-pill-left">
+                        <span class="fn-pill-dot"></span>
+                        ${esc(f.label)}
+                    </span>
+                    <span class="fn-pill-count">${String(c[f.id] || 0).padStart(2, '0')}</span>
+                </button>
+            `).join('');
+
+            return `
+                <div class="fn-logo-wrap">
+                    <div class="fn-logo fn-logo--hoverable">
+                        <span class="fn-logo-mark">A</span>
+                        <span class="fn-logo-name">ASCEND</span>
+                    </div>
+                    <div class="fn-logo-sub">Climbing // Jhamsikhel, NP</div>
+                    ${NAV_LINKS_HTML}
+                </div>
+
+                <div>
+                    <span class="fn-nav-label">// Filter</span>
+                    <div class="fn-filters" id="fn-filters">${pillsHtml}</div>
+                </div>
+
+                <div class="fn-sidebar-index-meta">
+                    <span class="fn-nav-label">// Index</span>
+                    <div class="fn-meta-line">
+                        <span>Entries</span>
+                        <span class="fn-meta-val">${String(POSTS.length).padStart(2, '0')}</span>
+                    </div>
+                    <div class="fn-meta-line">
+                        <span>Editor</span>
+                        <span class="fn-meta-val">Ascend</span>
+                    </div>
+                </div>
+
+                <div class="fn-sidebar-foot">
+                    <div>Ascend Climbing © 2026</div>
+                    <div>Jhamsikhel, Lalitpur</div>
+                    <div class="fn-sidebar-foot-links">
+                        <a href="https://www.instagram.com/ascendclimbing.np/" target="_blank" rel="noopener">Instagram →</a>
+                        <a href="tel:+9779764835306">+977 976 483 5306 →</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildSidebarArticle(post, body) {
+            const sectionList = body.sections.filter(s => s.title);
+            const tocHtml = sectionList.map(s => `
+                <button class="fn-toc-item" data-section="${esc(s.n)}">
+                    <span class="fn-toc-n">${esc(s.n)}</span>
+                    <span>${esc(s.title)}</span>
+                </button>
+            `).join('');
+
+            const detailsHtml = post.details ? `
+                <div>
+                    <span class="fn-nav-label">// Details</span>
+                    <div class="fn-article-details">
+                        ${Object.entries(post.details).map(([k, v]) => `
+                            <div class="fn-detail-row">
+                                <span class="fn-detail-k">${esc(DETAIL_LABELS[k] || k)}</span>
+                                <span class="fn-detail-v">${esc(v)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            return `
+                <div class="fn-logo-wrap">
+                    <div class="fn-logo fn-logo--hoverable">
+                        <span class="fn-logo-mark">A</span>
+                        <span class="fn-logo-name">ASCEND</span>
+                    </div>
+                    <div class="fn-logo-sub">Climbing // Jhamsikhel, NP</div>
+                    ${NAV_LINKS_HTML}
+                </div>
+
+                <button class="fn-back-btn" id="fn-back-btn">
+                    <span><span style="font-weight:700">←</span>&nbsp; Index</span>
+                    <span class="fn-esc-hint">Esc</span>
+                </button>
+
+                ${sectionList.length ? `
+                    <div>
+                        <span class="fn-nav-label">// In this entry</span>
+                        <div class="fn-toc" id="fn-toc">${tocHtml}</div>
+                    </div>
+                ` : ''}
+
+                <div>
+                    <span class="fn-nav-label">// Meta</span>
+                    <div class="fn-meta-line"><span>Filed</span><span class="fn-meta-val">${esc(post.date)}</span></div>
+                    <div class="fn-meta-line"><span>By</span><span class="fn-meta-val">${esc(body.signoff.author)}</span></div>
+                    <div class="fn-meta-line"><span>Read</span><span class="fn-meta-val">${esc(post.read)}</span></div>
+                    <div class="fn-meta-line"><span>Type</span><span class="fn-meta-val">${esc(CAT_LABEL[post.cat])}</span></div>
+                </div>
+
+                ${detailsHtml}
+
+                <div>
+                    <span class="fn-nav-label">// Share</span>
+                    <div class="fn-share-line">
+                        <button class="fn-share-btn" id="fn-copy-link">Copy Link →</button>
+                        <a href="https://www.instagram.com/ascendclimbing.np/" target="_blank" rel="noopener"
+                           style="font-size:11px;text-transform:uppercase;letter-spacing:0.16em;color:#6a6a6a;
+                                  display:block;padding:4px 0;">Instagram →</a>
+                    </div>
+                </div>
+
+                <div class="fn-sidebar-foot">
+                    <div>Ascend Climbing © 2026</div>
+                    <div>Jhamsikhel, Lalitpur</div>
+                </div>
+            `;
+        }
+
+        function buildRows(posts) {
+            if (posts.length === 0) {
+                return `<div class="fn-empty">
+                    <div class="fn-empty-big">NOTHING HERE YET</div>
+                    <div>Check back — or pick another filter.</div>
+                </div>`;
+            }
+            return posts.map(p => {
+                const num = ENTRY_NUM[p.id];
+                const thumbHtml = p.img ? `
+                    <div class="fn-thumb">
+                        ${imgTag(p.img, p.title)}
+                        <span class="fn-thumb-tag">N° ${esc(num)}</span>
+                    </div>
+                ` : '';
+
+                return `
+                    <article class="fn-row${p.pinned ? ' pinned' : ''}"
+                             data-id="${p.id}" role="button" tabindex="0"
+                             aria-label="Read: ${esc(p.title)}">
+                        ${p.pinned ? '<span class="fn-pin-badge">★ Pinned</span>' : ''}
+                        ${thumbHtml}
+                        <div class="fn-cat-wrap">
+                            <span class="fn-cat ${catClass(p.cat)}">${esc(CAT_LABEL[p.cat])}</span>
+                        </div>
+                        <div class="fn-row-body">
+                            <h2 class="fn-row-title">${esc(p.title)}</h2>
+                            <p class="fn-row-excerpt">${esc(p.excerpt)}</p>
+                            <div class="fn-row-meta">
+                                <span class="fn-row-date">${esc(p.date)}</span>
+                                <span class="fn-row-meta-sep">/</span>
+                                <span>${esc(p.tag)}</span>
+                                <span class="fn-row-meta-sep">/</span>
+                                <span>${esc(p.read)} read</span>
+                                <span class="fn-row-meta-sep">/</span>
+                                <span>N° ${esc(num)}</span>
+                            </div>
+                        </div>
+                        <div class="fn-arrow">→</div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function buildArticleBody(post, body) {
+            // Event details strip
+            const stripHtml = post.details ? `
+                <div class="fn-a-strip">
+                    <div class="fn-a-strip-row">
+                        <div class="fn-d-cell">
+                            <span class="fn-dk">Date</span>
+                            <span class="fn-dv">${esc(post.date)}</span>
+                        </div>
+                        ${Object.entries(post.details).map(([k, v]) => `
+                            <div class="fn-d-cell">
+                                <span class="fn-dk">${esc(DETAIL_LABELS[k] || k)}</span>
+                                <span class="fn-dv">${esc(v)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            // Prose sections
+            const sectionsHtml = body.sections.map((s, i) => {
+                if (s.quote) {
+                    return `
+                        <blockquote>
+                            "${esc(s.quote)}"
+                            <cite class="fn-cite">${esc(s.cite)}</cite>
+                        </blockquote>
+                    `;
+                }
+                const parasHtml = s.paragraphs.map(p =>
+                    `<p${p.lede ? ' class="fn-lede"' : ''}>${esc(p.text)}</p>`
+                ).join('');
+                return `
+                    <h2 id="fn-s${esc(s.n)}">
+                        <span class="fn-sec-num">${esc(s.n)}</span>${esc(s.title)}
+                    </h2>
+                    ${parasHtml}
+                `;
+            }).join('');
+
+            // Prev / next
+            const sortedAll = [...POSTS].sort((a, b) => parsePostDate(a.date) - parsePostDate(b.date));
+            const idx  = sortedAll.findIndex(p => p.id === post.id);
+            const prev = idx > 0                    ? sortedAll[idx - 1] : null;
+            const next = idx < sortedAll.length - 1 ? sortedAll[idx + 1] : null;
+
+            function npTile(p, dir) {
+                if (!p) {
+                    const label = dir === 'prev' ? 'Start of archive' : 'End of archive';
+                    return `<div class="fn-np fn-np--empty ${dir === 'next' ? 'fn-np--next' : ''}">
+                        <div class="fn-np-lbl"><span>—</span><span>${label}</span></div>
+                    </div>`;
+                }
+                const arrow = dir === 'prev' ? '←' : '→';
+                const catLabel = `${CAT_LABEL[p.cat]}`;
+                return `
+                    <div class="fn-np ${dir === 'next' ? 'fn-np--next' : ''}" data-id="${p.id}">
+                        <div class="fn-np-lbl">
+                            <span class="fn-np-arr">${arrow}</span>
+                            <span>${dir === 'prev' ? 'Previous' : 'Next'} · ${esc(catLabel)}</span>
+                        </div>
+                        <p class="fn-np-excerpt">${esc(p.excerpt)}</p>
+                        <div class="fn-np-title">${esc(p.title)}</div>
+                    </div>
+                `;
+            }
+
+            const heroImgHtml = post.img
+                ? `<div class="fn-hero-img">${imgTag(post.img, post.title)}</div>`
+                : `<div class="fn-hero-img fn-hero-img--placeholder">No image yet</div>`;
+
+            return `
+                <div class="fn-top-bar">
+                    <div class="fn-crumbs">
+                        <a href="index.html">Ascend</a>
+                        <span class="fn-crumb-sep"> / </span>
+                        <button style="background:none;border:0;cursor:pointer;font:inherit;
+                                       color:#6a6a6a;font-size:10px;letter-spacing:0.18em;
+                                       text-transform:uppercase;padding:0;"
+                                id="fn-crumb-back">Field Notes</button>
+                        <span class="fn-crumb-sep"> / </span>
+                        <span class="fn-crumb-cur">N° ${esc(ENTRY_NUM[post.id])}</span>
+                    </div>
+                </div>
+
+                <article class="fn-article" id="fn-article-content">
+                    <div class="fn-a-meta">
+                        <span class="fn-cat ${catClass(post.cat)}">${esc(CAT_LABEL[post.cat])}</span>
+                        <span class="fn-a-meta-fg">${esc(post.date)}</span>
+                        <span class="fn-a-meta-sep">/</span>
+                        <span>${esc(post.read)} read</span>
+                        <span class="fn-a-meta-sep">/</span>
+                        <span>${esc(post.tag)}</span>
+                        <span class="fn-a-meta-sep">/</span>
+                        <span>By <span class="fn-a-meta-fg">${esc(body.signoff.author)}</span></span>
+                    </div>
+
+                    <h1 class="fn-a-title">${esc(post.title)}</h1>
+                    <p class="fn-dek">${esc(body.dek)}</p>
+
+                    ${stripHtml}
+
+                    <figure>
+                        ${heroImgHtml}
+                        <figcaption class="fn-img-caption">
+                            <span class="fn-cap-lead">${esc(body.caption.lead)}</span>
+                            &nbsp;—&nbsp;${esc(body.caption.note)}
+                        </figcaption>
+                    </figure>
+
+                    <div class="fn-body-grid">
+                        <div class="fn-body-gutter">
+                            N° <span class="fn-gutter-n">${esc(ENTRY_NUM[post.id])}</span><br>
+                            ${esc(post.date)}<br>
+                            ${esc(body.signoff.author.split(' ').slice(-1)[0])}<br>
+                            <br>↓
+                        </div>
+                        <div class="fn-prose">
+                            ${sectionsHtml}
+
+                            <div class="fn-signoff">
+                                — <span class="fn-signoff-name">${esc(body.signoff.author)}</span>,
+                                ${esc(body.signoff.role)}<br>
+                                Filed ${esc(body.signoff.date)} · Ascend / Field Notes
+                                <div class="fn-tags">
+                                    ${body.tags.map(t => `<span class="fn-tag">${esc(t)}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="fn-nextprev" aria-label="More entries">
+                        <div class="fn-nextprev-head">— Keep reading —</div>
+                        <div class="fn-nextprev-pair">
+                            ${npTile(prev, 'prev')}
+                            ${npTile(next, 'next')}
+                        </div>
+                    </nav>
+                </article>
+            `;
+        }
+
+        // ── Render ──
+
+        function renderIndex() {
+            const posts = sortedFiltered();
+            const c = counts();
+
+            app.innerHTML = `
+                <div class="fn-view" id="fn-index-view">
+                    <aside class="fn-sidebar" id="fn-sidebar">
+                        ${buildSidebarIndex()}
+                    </aside>
+                    <main class="fn-main" id="fn-main">
+                        <div class="fn-top-bar">
+                            <div class="fn-crumbs">
+                                <a href="index.html">Ascend</a>
+                                <span class="fn-crumb-sep"> / </span>
+                                <span class="fn-crumb-cur">Field Notes</span>
+                            </div>
+                        </div>
+
+                        <section class="fn-hero">
+                            <h1 class="fn-hero-title"><span class="fn-slash">/</span>FIELD NOTES</h1>
+                            <div class="fn-hero-sub">
+                                Dispatches from the wall.<br>
+                                Updated when there's something to say.
+                                <span class="fn-hero-muted">Jhamsikhel, Lalitpur</span>
+                            </div>
+                        </section>
+
+                        <div class="fn-sub-bar">
+                            <div>
+                                <span class="fn-count-now">${String(posts.length).padStart(2, '0')}</span>
+                                <span> entries —
+                                    ${esc(POST_FILTERS.find(f => f.id === currentFilter).label.toUpperCase())}
+                                </span>
+                            </div>
+                            <div class="fn-sort">
+                                <span style="color:#6a6a6a">Sort</span>
+                                <button class="fn-sort-btn${currentSort === 'new' ? ' active' : ''}" data-sort="new">Newest</button>
+                                <span class="fn-sort-sep">/</span>
+                                <button class="fn-sort-btn${currentSort === 'old' ? ' active' : ''}" data-sort="old">Oldest</button>
+                            </div>
+                        </div>
+
+                        <div class="fn-list" id="fn-list">
+                            ${buildRows(posts)}
+                        </div>
+
+                        <div class="fn-foot">
+                            <span>End of index — ${String(posts.length).padStart(2, '0')} of ${String(POSTS.length).padStart(2, '0')}</span>
+                        </div>
+                    </main>
+                    <footer class="fn-mobile-foot">
+                        <div>Ascend Climbing © 2026</div>
+                        <div>Jhamsikhel, Lalitpur</div>
+                        <div class="fn-mobile-foot-links">
+                            <a href="https://www.instagram.com/ascendclimbing.np/" target="_blank" rel="noopener">Instagram →</a>
+                            <a href="tel:+9779764835306">+977 976 483 5306 →</a>
+                        </div>
+                    </footer>
+                </div>
+            `;
+
+            bindIndexEvents();
+            bindDropdown();
+        }
+
+        function renderArticle(postId) {
+            const post = POSTS.find(p => p.id === postId);
+            if (!post) { renderIndex(); return; }
+            const body = bodyFor(post);
+
+            app.innerHTML = `
+                <div class="fn-view" id="fn-article-view">
+                    <aside class="fn-sidebar" id="fn-sidebar-art">
+                        ${buildSidebarArticle(post, body)}
+                    </aside>
+                    <main class="fn-main fn-main--article" id="fn-main-art">
+                        ${buildArticleBody(post, body)}
+                    </main>
+                    <footer class="fn-mobile-foot">
+                        <div>Ascend Climbing © 2026</div>
+                        <div>Jhamsikhel, Lalitpur</div>
+                        <div class="fn-mobile-foot-links">
+                            <a href="https://www.instagram.com/ascendclimbing.np/" target="_blank" rel="noopener">Instagram →</a>
+                            <a href="tel:+9779764835306">+977 976 483 5306 →</a>
+                        </div>
+                    </footer>
+                </div>
+            `;
+
+            bindArticleEvents(post, body);
+            bindDropdown();
+        }
+
+        // ── Dropdown (click on mobile) ──
+
+        let _dropdownCloseHandler = null;
+        function bindDropdown() {
+            const logoWrap = document.querySelector('.fn-logo-wrap');
+            const sidebar  = document.querySelector('[id^="fn-sidebar"]');
+            if (!logoWrap) return;
+
+            if (_dropdownCloseHandler) document.removeEventListener('click', _dropdownCloseHandler);
+
+            logoWrap.addEventListener('click', e => {
+                if (window.innerWidth > 900) return;
+                e.stopPropagation();
+                const open = logoWrap.classList.toggle('fn-dropdown-open');
+                if (sidebar) sidebar.classList.toggle('fn-dropdown-open', open);
+            });
+
+            _dropdownCloseHandler = e => {
+                if (!logoWrap.contains(e.target)) {
+                    logoWrap.classList.remove('fn-dropdown-open');
+                    if (sidebar) sidebar.classList.remove('fn-dropdown-open');
+                }
+            };
+            document.addEventListener('click', _dropdownCloseHandler);
+        }
+
+        // ── Event binding ──
+
+        function bindIndexEvents() {
+            // Filter pills
+            document.querySelectorAll('.fn-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentFilter = btn.dataset.filter;
+                    renderIndex();
+                });
+            });
+
+            // Sort buttons
+            document.querySelectorAll('.fn-sort-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentSort = btn.dataset.sort;
+                    renderIndex();
+                });
+            });
+
+            // List rows
+            document.querySelectorAll('.fn-row').forEach(row => {
+                function activate() {
+                    const id = parseInt(row.dataset.id, 10);
+                    openArticle(id);
+                }
+                row.addEventListener('click', activate);
+                row.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+                });
+            });
+        }
+
+        function bindArticleEvents(post, body) {
+            // Back button (sidebar)
+            const backBtn = document.getElementById('fn-back-btn');
+            if (backBtn) backBtn.addEventListener('click', closeArticle);
+
+            // Breadcrumb back
+            const crumbBack = document.getElementById('fn-crumb-back');
+            if (crumbBack) crumbBack.addEventListener('click', closeArticle);
+
+            // TOC: smooth scroll to section
+            document.querySelectorAll('.fn-toc-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = 'fn-s' + btn.dataset.section;
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const top = el.getBoundingClientRect().top + window.scrollY
+                                    - parseInt(getComputedStyle(document.documentElement)
+                                        .getPropertyValue('--header-height')) - 24;
+                        window.scrollTo({ top, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Prev / next tiles
+            document.querySelectorAll('.fn-np[data-id]').forEach(tile => {
+                tile.addEventListener('click', () => {
+                    const id = parseInt(tile.dataset.id, 10);
+                    openArticle(id);
+                });
+            });
+
+            // Copy link
+            const copyBtn = document.getElementById('fn-copy-link');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        copyBtn.textContent = 'Copied →';
+                        setTimeout(() => { copyBtn.textContent = 'Copy Link →'; }, 2000);
+                    }).catch(() => {});
+                });
+            }
+
+            // Esc to close
+            function onKey(e) {
+                if (e.key === 'Escape') {
+                    closeArticle();
+                    window.removeEventListener('keydown', onKey);
+                }
+            }
+            window.addEventListener('keydown', onKey);
+        }
+
+        // ── Navigation ──
+
+        function openArticle(id) {
+            currentPostId = id;
+            history.pushState({ postId: id }, '', '#post-' + id);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            renderArticle(id);
+            lenis.scrollTo(0, { immediate: true });
+        }
+
+        function closeArticle() {
+            currentPostId = null;
+            history.pushState({ postId: null }, '', window.location.pathname);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            renderIndex();
+            lenis.scrollTo(0, { immediate: true });
+        }
+
+        // Browser back/forward
+        window.addEventListener('popstate', e => {
+            if (e.state && e.state.postId) {
+                currentPostId = e.state.postId;
+                renderArticle(e.state.postId);
+            } else {
+                currentPostId = null;
+                renderIndex();
+            }
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        });
+
+        // ── Init ──
+
+        // Check if page loaded with a post hash (e.g., stories.html#post-2)
+        const hashMatch = window.location.hash.match(/^#post-(\d+)$/);
+        if (hashMatch) {
+            const id = parseInt(hashMatch[1], 10);
+            const post = POSTS.find(p => p.id === id);
+            if (post) {
+                currentPostId = id;
+                renderArticle(id);
+            } else {
+                renderIndex();
+            }
+        } else {
+            renderIndex();
+        }
+
+    }); // end DOMContentLoaded
+    </script>
+
+</body>
+</html>

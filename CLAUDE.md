@@ -12,10 +12,14 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 |------|---------|
 | `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → About → Footer |
 | `cafe.html` | Standalone cafe menu page |
+| `stories.html` | Field Notes page: blog/events/rock-day listing + inline article view. All JS is inline. Loads `posts.js` then renders everything via vanilla JS. |
+| `stories.css` | All styles for the Field Notes page. Scoped to `.fn-*` to avoid collision with `styles.css`. `.fn-view` is the grid container (260px sidebar + 1fr main). |
+| `posts.js` | Post data array (`POSTS`), full article bodies (`BODIES`), and utilities (`ENTRY_NUM`, `POST_FILTERS`, `CAT_LABEL`, `DETAIL_LABELS`, `parsePostDate`, `bodyFor`). Edit here to add/update posts. |
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
 | `img/square/` | 9 photos (currently unused) |
 | `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif`, `rock-day.avif` (Rock Day section), `training-room.avif` |
+| `img/stories/` | Cover images for Field Notes posts (`[slug].jpg`). Referenced by `img` field in `posts.js`. |
 | `img/site-favicon.svg` | Favicon (white circle + dark star) |
 | `fonts/Gandur New-Light.otf` | Local brand display font |
 | `ref/` | Course images, logo, reference screenshots |
@@ -61,11 +65,22 @@ Aesthetic: brutalist/minimal, dark, monospace.
 - Header + `.nav-links` share **one** entrance timeline (same frames). Scroll-hide navbar = GSAP `y` tween on both elements with 30px hysteresis; frozen while menu is open/closing.
 - `startHeroIdleAnimations()` — periodic triangle spin (`#geo-tri-a`) + circle bounce (`#geo-circle-tr`) on the landing SVG mark.
 - `updateNavDateTime()` — live `#nav-datetime` clock, `Asia/Kathmandu`.
-- Scroll reveals: `.scroll-section` → `.animate-up` children (y+opacity, stagger); `cinematicCharReveal()` blur+green-flicker on the 3 section headers; `.pass-price` blue→white flash; `.feature-img-wrap` and `.img-reveal-container` clip-path wipes.
+- Scroll reveals: `.scroll-section` → `.animate-up` children (y+opacity, stagger); `cinematicCharReveal()` blur+green-flicker on the 3 section headers; `.pass-price` blue→white flash; `.feature-img-wrap` and `.img-reveal-container` clip-path wipes. Feature images animate `scale: 1.03 → 1.01` (zoom-out depth); resting at `1.01` prevents sub-pixel blue-edge bleed. The ScrollTrigger trigger falls back to `.grid-row` for images not inside `.feature-item` (e.g. rock-day).
 - Scramble-text effect on hover for bare `<a>` tags.
 - Hamburger menu — toggles `.active` / `.mobile-active` / `body.menu-open`; close clip-path tween restores scroll-hide state in its `onComplete`.
 - `initTestimonialsCarousel()` — renders from a `REVIEWS` array (6 reviews; each `parts` item is `{t}` or `{d,t}` where `d` ∈ pill/outline/oval/sparkle/wave/underline → `.t-*` spans). Measures the tallest slide to fix `min-height` (prevents layout shift). Auto-rotates 8s; arrow keys when in view.
 - `updateHeaderHeight()` — writes `--header-height` on load + resize.
+
+---
+
+## Field Notes page (stories.html)
+
+- The page is a single-page app rendered entirely by JS into `<div id="fn-app">`. There is no static HTML inside the app div — everything is built by `renderIndex()` / `renderArticle()` on each view switch.
+- **`.fn-view` IS the CSS grid container** (260px sidebar + 1fr main). Do NOT change this to `display: contents` — it breaks the grid because Chromium doesn't propagate grid context through `display: contents` reliably for dynamically injected subtrees.
+- URL hash routing: opening a post pushes `#post-{id}` to history. Reloading with that hash re-opens the article directly. Back/forward browser buttons work via `popstate`.
+- Posts are in `posts.js` — `POSTS` array for list data, `BODIES` map for full-length articles. Posts without a `BODIES` entry render a short "Brief" fallback automatically.
+- Shared nav/header logic (Lenis, header scroll, menu toggle, clock) is duplicated inline in `stories.html`. If you change nav behavior in `main.js`, mirror the change in `stories.html`.
+- The `a::before` blue-fill hover effect (from `styles.css`) is suppressed on sidebar links and top-bar nav links using `::before { display: none }` and `position: static` overrides.
 
 ---
 
