@@ -262,18 +262,21 @@ header {
        because sticky + z-index creates its own stacking context */
 }
 
-/* In standalone PWA mode the transparent header lets scrolled content bleed
-   into the Dynamic Island zone. A solid background catches it. The existing
-   top: calc(0.75rem + env(safe-area-inset-top)) already positions the header
-   correctly — no extra offset needed. The blue scrolled pill is suppressed
-   since the solid header provides its own visual separation. */
+/* In standalone PWA mode push the entire body below the Dynamic Island so
+   the html background (#0e0e0e) fills the DI zone seamlessly — no content
+   behind the island, no extra blank strip inside the header.
+   max(env(...), 59px) guards against iOS PWA shortcut caching env() as 0. */
+html.pwa-standalone body {
+    padding-top: max(env(safe-area-inset-top), 59px);
+}
+/* Header keeps its normal height; stick just below the DI zone. */
 html.pwa-standalone header {
     background-color: var(--bg-color);
+    top: calc(max(env(safe-area-inset-top), 59px) + 0.75rem);
 }
-html.pwa-standalone header.scrolled .nav-row {
-    background-color: transparent;
-    box-shadow: none;
-    border-radius: 0;
+/* Fixed nav-links: shift down by the same DI offset. */
+html.pwa-standalone .nav-links {
+    top: calc(max(env(safe-area-inset-top), 59px) + 0.75rem + var(--header-height, 72px) / 2);
 }
 
 /* stories.html: mobile sidebar acts as the sticky top nav.
