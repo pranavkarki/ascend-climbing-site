@@ -269,7 +269,6 @@ header {
    matches the page background, so the DI zone is seamless.
    max(env(...), 59px) guards against iOS PWA shortcut caching env() as 0. */
 html.pwa-standalone header {
-    background-color: var(--bg-color);
     padding-top: max(env(safe-area-inset-top), 59px);
     top: 0;
 }
