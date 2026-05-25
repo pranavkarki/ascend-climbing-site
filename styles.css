@@ -255,20 +255,11 @@ section.no-pad {
 header {
     position: sticky;
     width: 100%;
-    top: calc(0.75rem + env(safe-area-inset-top));
+    top: 0.75rem;
     background-color: transparent;
     z-index: 1000;
     /* Blend against page content — must be on the header itself, not children,
        because sticky + z-index creates its own stacking context */
-}
-
-/* In standalone (Add to Home Screen) mode, env(safe-area-inset-top) caches as 0
-   on iOS, so the header starts at y:0 — physically behind the Dynamic Island.
-   The pwa-standalone class is added synchronously by an inline <script> in <head>
-   before first paint. Padding pushes the nav content below the island and lets
-   updateHeaderHeight() measure the new taller header correctly. */
-html.pwa-standalone header {
-    padding-top: max(env(safe-area-inset-top), 59px);
 }
 
 
@@ -296,7 +287,7 @@ html.pwa-standalone header {
        the sticky parent's box on iOS WebKit). On desktop, position over the nav-row
        using the header's sticky offset + half the measured header height. */
     position: fixed;
-    top: calc(0.75rem + env(safe-area-inset-top, 0px) + var(--header-height, 72px) / 2);
+    top: calc(0.75rem + var(--header-height, 72px) / 2);
     left: 33.333vw;
     transform: translate(-50%, -50%);
     display: flex;
@@ -880,10 +871,7 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
 /* Responsive adjustments */
 @media (max-width: 992px) {
     /* When the mobile menu is open, fade out <main> and <header> so the body's
-       dark background (which extends edge-to-edge under viewport-fit=cover) is
-       what shows in the iOS safe-area zones (dynamic island, home indicator).
-       Body bg matches the popup bg, so the dynamic island area looks uniform
-       even if iOS clamps the popup's `position: fixed` bounds to the safe area. */
+       dark background shows through, keeping the menu overlay visually uniform. */
     main, header {
         transition: opacity 0.25s ease;
     }
@@ -916,10 +904,8 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     .nav-links {
         display: flex;
         position: fixed;
-        /* Overshoot the viewport by 200px on every side. This guarantees the dark
-           background extends past the dynamic island and home indicator on iOS,
-           regardless of whether viewport-fit=cover / env() values are picked up
-           (PWA shortcuts cache the viewport meta at install time). */
+        /* Overshoot the viewport by 200px on every side so the overlay background
+           bleeds past any OS chrome (status bar, home indicator) on iOS. */
         top: -200px;
         left: -200px;
         right: -200px;
@@ -943,7 +929,7 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
 
     .menu-toggle {
         position: fixed;
-        bottom: calc(1.75rem + env(safe-area-inset-bottom));
+        bottom: 1.75rem;
         left: 50%;
         right: auto;
         top: auto;
