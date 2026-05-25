@@ -262,22 +262,27 @@ header {
        because sticky + z-index creates its own stacking context */
 }
 
-/* In standalone PWA mode the viewport extends behind the Dynamic Island
-   (viewport-fit=cover) but the transparent header lets scrolled content bleed
-   into the island zone. Fix: stick the header from y:0 with a solid background
-   so it acts as an opaque cover over the island zone, and pad the nav content
-   below the island. The blue scrolled pill is suppressed — the solid header
-   already provides clear visual separation. updateHeaderHeight() picks up the
-   new taller height automatically. */
+/* In standalone PWA mode the transparent header lets scrolled content bleed
+   into the Dynamic Island zone. A solid background catches it. The existing
+   top: calc(0.75rem + env(safe-area-inset-top)) already positions the header
+   correctly — no extra offset needed. The blue scrolled pill is suppressed
+   since the solid header provides its own visual separation. */
 html.pwa-standalone header {
-    top: 0;
     background-color: var(--bg-color);
-    padding-top: max(env(safe-area-inset-top), 59px);
 }
 html.pwa-standalone header.scrolled .nav-row {
     background-color: transparent;
     box-shadow: none;
     border-radius: 0;
+}
+
+/* stories.html: mobile sidebar acts as the sticky top nav.
+   Push it below the Dynamic Island and give it a solid background. */
+@media (max-width: 900px) {
+    html.pwa-standalone .fn-sidebar {
+        top: max(env(safe-area-inset-top), 59px);
+        background-color: var(--bg-color);
+    }
 }
 
 
