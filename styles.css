@@ -268,7 +268,7 @@ header {
    before first paint. Padding pushes the nav content below the island and lets
    updateHeaderHeight() measure the new taller header correctly. */
 html.pwa-standalone header {
-    padding-top: max(env(safe-area-inset-top), 47px);
+    padding-top: max(env(safe-area-inset-top), 59px);
 }
 
 
