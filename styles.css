@@ -263,12 +263,12 @@ header {
 }
 
 /* In standalone (Add to Home Screen) mode, env(safe-area-inset-top) caches as 0
-   on iOS. Use max() so the hardcoded 47px floor clears the Dynamic Island / notch
-   on all current iPhones without affecting normal Safari browser rendering. */
-@media (display-mode: standalone) {
-    header {
-        top: calc(0.75rem + max(env(safe-area-inset-top), 47px));
-    }
+   on iOS, so the header starts at y:0 — physically behind the Dynamic Island.
+   The pwa-standalone class is added synchronously by an inline <script> in <head>
+   before first paint. Padding pushes the nav content below the island and lets
+   updateHeaderHeight() measure the new taller header correctly. */
+html.pwa-standalone header {
+    padding-top: max(env(safe-area-inset-top), 47px);
 }
 
 
