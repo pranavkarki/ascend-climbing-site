@@ -262,21 +262,16 @@ header {
        because sticky + z-index creates its own stacking context */
 }
 
-/* In standalone PWA mode push the entire body below the Dynamic Island so
-   the html background (#0e0e0e) fills the DI zone seamlessly — no content
-   behind the island, no extra blank strip inside the header.
+/* In standalone PWA mode the header covers the Dynamic Island zone with its
+   background so scrolled content can't bleed behind the island. padding-top
+   pushes the nav-row below the DI; top: 0 makes the header stick flush to
+   the viewport top so there is no gap. The header background (#0e0e0e)
+   matches the page background, so the DI zone is seamless.
    max(env(...), 59px) guards against iOS PWA shortcut caching env() as 0. */
-html.pwa-standalone body {
-    padding-top: max(env(safe-area-inset-top), 59px);
-}
-/* Header keeps its normal height; stick just below the DI zone. */
 html.pwa-standalone header {
     background-color: var(--bg-color);
-    top: calc(max(env(safe-area-inset-top), 59px) + 0.75rem);
-}
-/* Fixed nav-links: shift down by the same DI offset. */
-html.pwa-standalone .nav-links {
-    top: calc(max(env(safe-area-inset-top), 59px) + 0.75rem + var(--header-height, 72px) / 2);
+    padding-top: max(env(safe-area-inset-top), 59px);
+    top: 0;
 }
 
 /* stories.html: mobile sidebar acts as the sticky top nav.

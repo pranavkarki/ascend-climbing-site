@@ -57,7 +57,7 @@ Aesthetic: brutalist/minimal, dark, monospace.
 - `.about-body` — shared style for the About section paragraph and the Activities intro paragraph. Spans grid columns 1–2, uppercase, 14px, muted colour. Used as a direct child of `.grid-row`.
 - Scroll past 200px toggles **both** `header.scrolled` and `body.header-scrolled` (the latter scopes nav link-color since `.nav-links` lives outside the header).
 - iOS safe areas: mobile nav overlay uses a hardcoded `-200px` overshoot on all sides (not `env()`, which iOS PWA shortcuts cache as 0). Fixed/sticky edge elements add `env(safe-area-inset-*)`. Full rationale in `styles.css` comments.
-- PWA standalone: `html.pwa-standalone body` gets `padding-top: max(env(safe-area-inset-top), 59px)` to push all content below the Dynamic Island. The `html` background (#0e0e0e) fills the DI zone seamlessly. The header gets `background-color: var(--bg-color)` (blocks scroll-through) and `top: calc(max(env(safe-area-inset-top), 59px) + 0.75rem)` to stick just below the DI. Fixed `.nav-links` get the same offset added to their `top`. `--header-height` stays the same (~nav-row height, unchanged). The blue scrolled pill shows normally in PWA (no suppression).
+- PWA standalone header: `html.pwa-standalone header` gets `background-color: var(--bg-color)`, `padding-top: max(env(safe-area-inset-top), 59px)`, and `top: 0`. The padding pushes the nav-row below the DI; `top: 0` keeps the header flush to the viewport so the background covers the DI zone seamlessly. Do NOT use `body { padding-top }` — it breaks sticky (header starts above the `top` threshold so sticky never fires) and nav-links overrides break the mobile menu overlay. `--header-height` (measured by JS) includes the padding and will be ~86px in PWA mode.
 
 ---
 
