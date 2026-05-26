@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="theme-color" content="#0e0e0e">
     <meta name="description" content="Field Notes — dispatches from the wall. Events, stories, and rock day trip reports from Ascend Climbing in Jhamsikhel, Lalitpur.">
-    <meta name="robots" content="noindex, follow">
+    <meta name="robots" content="index, follow">
     <meta property="og:title" content="Field Notes — Ascend Climbing">
     <meta property="og:description" content="Dispatches from the wall. Events, stories, and rock day trip reports from Ascend Climbing.">
     <meta property="og:type" content="website">
@@ -109,13 +109,16 @@
 
         // ── Build HTML pieces ──
 
-        const NAV_LINKS_HTML = `
-            <div class="fn-nav-dropdown">
-                <a href="/">← Ascend</a>
-                <a href="/#pricing">Pricing</a>
-                <a href="/#activities">Activities</a>
-                <a href="/#features">Features</a>
-                <a href="/#about">About</a>
+        const NAV_DROPDOWN_BTN = `
+            <div class="fn-topnav-wrap">
+                <button class="fn-topnav-btn" aria-label="Site navigation"><svg class="fn-topnav-chevron" viewBox="16.451 43.607 167.098 112.786" width="12" height="12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M100.316 98.235l54.312-54.312 28.921 28.921L100 156.393 16.451 72.844l29.237-29.237 54.628 54.628z"/></svg> NAV</button>
+                <div class="fn-topnav-dropdown">
+                    <a href="/">← Ascend</a>
+                    <a href="/#pricing">Pricing</a>
+                    <a href="/#activities">Activities</a>
+                    <a href="/#features">Features</a>
+                    <a href="/#about">About</a>
+                </div>
             </div>
         `;
 
@@ -138,13 +141,14 @@
                         <span class="fn-logo-name">ASCEND</span>
                     </div>
                     <div class="fn-logo-sub">Climbing // Jhamsikhel, NP</div>
-                    ${NAV_LINKS_HTML}
                 </div>
 
                 <div>
                     <span class="fn-nav-label">// Filter</span>
                     <div class="fn-filters" id="fn-filters">${pillsHtml}</div>
                 </div>
+
+                <div class="fn-sidebar-nav">${NAV_DROPDOWN_BTN}</div>
 
                 <div class="fn-sidebar-index-meta">
                     <span class="fn-nav-label">// Index</span>
@@ -199,7 +203,6 @@
                         <span class="fn-logo-name">ASCEND</span>
                     </div>
                     <div class="fn-logo-sub">Climbing // Jhamsikhel, NP</div>
-                    ${NAV_LINKS_HTML}
                 </div>
 
                 <button class="fn-back-btn" id="fn-back-btn">
@@ -207,14 +210,22 @@
                     <span class="fn-esc-hint">Esc</span>
                 </button>
 
+                <div class="fn-sidebar-nav">${NAV_DROPDOWN_BTN}</div>
+
                 ${sectionList.length ? `
                     <div>
                         <span class="fn-nav-label">// In this entry</span>
-                        <div class="fn-toc" id="fn-toc">${tocHtml}</div>
+                        <div class="fn-toc-box">
+                            <button class="fn-toc-cur" id="fn-toc-cur">
+                                <span id="fn-toc-cur-text">${sectionList[0].n} — ${esc(sectionList[0].title)}</span>
+                                <span class="fn-toc-arrow">↓</span>
+                            </button>
+                            <div class="fn-toc-list" id="fn-toc-list">${tocHtml}</div>
+                        </div>
                     </div>
                 ` : ''}
 
-                <div>
+                <div class="fn-sidebar-article-meta">
                     <span class="fn-nav-label">// Meta</span>
                     <div class="fn-meta-line"><span>Filed</span><span class="fn-meta-val">${esc(post.date)}</span></div>
                     <div class="fn-meta-line"><span>By</span><span class="fn-meta-val">${esc(body.signoff.author)}</span></div>
@@ -368,6 +379,7 @@
                         <span class="fn-crumb-sep"> / </span>
                         <span class="fn-crumb-cur">N° ${esc(ENTRY_NUM[post.id])}</span>
                     </div>
+                    <div class="fn-top-bar-right">${NAV_DROPDOWN_BTN}</div>
                 </div>
 
                 <article class="fn-article" id="fn-article-content">
@@ -445,6 +457,7 @@
                                 <span class="fn-crumb-sep"> / </span>
                                 <span class="fn-crumb-cur">Field Notes</span>
                             </div>
+                            <div class="fn-top-bar-right">${NAV_DROPDOWN_BTN}</div>
                         </div>
 
                         <section class="fn-hero">
@@ -548,6 +561,31 @@
             document.addEventListener('click', _dropdownCloseHandler);
         }
 
+        // ── Top-bar / sidebar nav dropdown ──
+
+        function bindTopNav() {
+            const sidebar = document.querySelector('[id^="fn-sidebar"]');
+            document.querySelectorAll('.fn-topnav-btn').forEach(btn => {
+                const wrap = btn.closest('.fn-topnav-wrap');
+                const dropdown = wrap && wrap.querySelector('.fn-topnav-dropdown');
+                if (!dropdown) return;
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const opening = !dropdown.classList.contains('fn-topnav-open');
+                    document.querySelectorAll('.fn-topnav-dropdown').forEach(d => d.classList.remove('fn-topnav-open'));
+                    dropdown.classList.toggle('fn-topnav-open', opening);
+                    // On mobile let the dropdown escape the sidebar's overflow clip
+                    if (sidebar && window.innerWidth <= 900) {
+                        sidebar.classList.toggle('fn-dropdown-open', opening);
+                    }
+                });
+            });
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.fn-topnav-dropdown').forEach(d => d.classList.remove('fn-topnav-open'));
+                if (sidebar && window.innerWidth <= 900) sidebar.classList.remove('fn-dropdown-open');
+            });
+        }
+
         // ── Event binding ──
 
         function bindIndexEvents() {
@@ -578,6 +616,8 @@
                     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
                 });
             });
+
+            bindTopNav();
         }
 
         function bindArticleEvents(post, body) {
@@ -589,9 +629,41 @@
             const crumbBack = document.getElementById('fn-crumb-back');
             if (crumbBack) crumbBack.addEventListener('click', closeArticle);
 
+            // Nav dropdown toggle
+            bindTopNav();
+
+            // TOC dropdown toggle
+            const tocCur = document.getElementById('fn-toc-cur');
+            const tocList = document.getElementById('fn-toc-list');
+            if (tocCur && tocList) {
+                tocCur.addEventListener('click', e => {
+                    e.stopPropagation();
+                    tocList.classList.toggle('fn-toc-open');
+                });
+                document.addEventListener('click', () => tocList.classList.remove('fn-toc-open'));
+            }
+
+            // TOC: track current section on scroll
+            const tocSections = body.sections.filter(s => s.title);
+            const curText = document.getElementById('fn-toc-cur-text');
+            if (tocSections.length && curText) {
+                function updateTocActive() {
+                    const threshold = 140;
+                    let active = tocSections[0];
+                    tocSections.forEach(s => {
+                        const el = document.getElementById('fn-s' + s.n);
+                        if (el && el.getBoundingClientRect().top < threshold) active = s;
+                    });
+                    curText.textContent = active.n + ' — ' + active.title;
+                }
+                window.addEventListener('scroll', updateTocActive);
+                updateTocActive();
+            }
+
             // TOC: smooth scroll to section
             document.querySelectorAll('.fn-toc-item').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    if (tocList) tocList.classList.remove('fn-toc-open');
                     const id = 'fn-s' + btn.dataset.section;
                     const el = document.getElementById(id);
                     if (el) {
