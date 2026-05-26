@@ -487,6 +487,7 @@
 
             bindIndexEvents();
             bindDropdown();
+            setSidebarHeight();
         }
 
         function renderArticle(postId) {
@@ -515,6 +516,20 @@
 
             bindArticleEvents(post, body);
             bindDropdown();
+            setSidebarHeight();
+        }
+
+        // ── Fixed sidebar height measurement ──
+        // On mobile the sidebar is position:fixed, so .fn-main needs a
+        // padding-top equal to the sidebar's rendered height. env() alone
+        // is unreliable (Safari can return 0 initially), so we measure
+        // the actual offsetHeight after each render and write --fn-sidebar-h.
+        function setSidebarHeight() {
+            if (window.innerWidth > 900) return;
+            const sidebar = document.querySelector('[id^="fn-sidebar"]');
+            if (!sidebar) return;
+            const h = sidebar.offsetHeight;
+            document.documentElement.style.setProperty('--fn-sidebar-h', h + 'px');
         }
 
         // ── Dropdown (click on mobile) ──
@@ -644,6 +659,8 @@
             renderIndex();
             lenis.scrollTo(0, { immediate: true });
         }
+
+        window.addEventListener('resize', setSidebarHeight);
 
         // Browser back/forward
         window.addEventListener('popstate', e => {

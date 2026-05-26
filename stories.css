@@ -908,18 +908,24 @@
         min-height: auto;
     }
 
-    /* Sidebar collapses to horizontal top strip */
+    /* Sidebar collapses to fixed horizontal top strip.
+       position:fixed (not sticky) is used because sticky inside CSS Grid
+       is unreliable in Safari mobile. fixed is anchored to the viewport
+       so it always covers the Dynamic Island zone.
+       JS measures the rendered height and sets --fn-sidebar-h so .fn-main
+       can offset itself — no reliance on env() for layout safety. */
     .fn-sidebar {
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
         height: auto;
         flex-direction: row;
         align-items: center;
         flex-wrap: nowrap;
         gap: 10px;
         padding: 10px 16px;
-        /* viewport-fit=cover extends the viewport into the DI zone on all
-           browsers. Override padding-top after the shorthand so env() wins. */
         padding-top: env(safe-area-inset-top, 10px);
         border-right: 0;
         border-bottom: 0.5pt solid var(--line-color);
@@ -930,7 +936,6 @@
     }
     /* PWA: floor guards against iOS caching env() as 0 on shortcuts */
     html.pwa-standalone .fn-sidebar {
-        top: 0;
         padding-top: max(env(safe-area-inset-top), 59px);
     }
     .fn-sidebar::-webkit-scrollbar { display: none; }
@@ -997,8 +1002,8 @@
     }
     .fn-esc-hint { display: none; }
 
-    /* Main area */
-    .fn-main { padding: 18px 16px 80px; }
+    /* Main area — padding-top is controlled by --fn-sidebar-h (set by JS) */
+    .fn-main { padding: var(--fn-sidebar-h, 74px) 16px 80px; }
 
     /* Hero: single column */
     .fn-hero { grid-template-columns: 1fr; padding: 28px 0 22px; gap: 12px; }
