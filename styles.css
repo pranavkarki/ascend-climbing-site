@@ -276,8 +276,13 @@ html.pwa-standalone header {
 /* stories.html: mobile sidebar acts as the sticky top nav.
    Push it below the Dynamic Island and give it a solid background. */
 @media (max-width: 900px) {
+    /* Same pattern as the main-site header: top:0 + padding-top covers the DI
+       zone with the sidebar's own background so scrolled content can't bleed
+       through. Using padding-top (not top offset) is key — top offset just
+       moves the snap point, leaving an uncovered gap above. */
     html.pwa-standalone .fn-sidebar {
-        top: max(env(safe-area-inset-top), 59px);
+        top: 0;
+        padding-top: max(env(safe-area-inset-top), 59px);
         background-color: var(--bg-color);
     }
 }
