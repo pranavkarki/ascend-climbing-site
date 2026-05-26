@@ -3,10 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <script>if (window.navigator.standalone) document.documentElement.classList.add('pwa-standalone');</script>
+    <!-- Plain viewport (no viewport-fit=cover) keeps the page inside the safe
+         area, so content never draws under the status bar/notch — no bleed
+         (matches the reference sites + test-plain.html). apple-mobile-web-app-
+         capable keeps it installable; status-bar-style:black (opaque, NOT
+         black-translucent) makes the standalone PWA also sit below the status
+         bar, so it doesn't bleed and the header isn't pushed down by an env floor. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="theme-color" content="#0e0e0e">
     <meta name="description" content="Field Notes — dispatches from the wall. Events, stories, and rock day trip reports from Ascend Climbing in Jhamsikhel, Lalitpur.">
     <meta name="robots" content="noindex, follow">
@@ -487,7 +492,6 @@
 
             bindIndexEvents();
             bindDropdown();
-            setSidebarHeight();
         }
 
         function renderArticle(postId) {
@@ -516,20 +520,6 @@
 
             bindArticleEvents(post, body);
             bindDropdown();
-            setSidebarHeight();
-        }
-
-        // ── Fixed sidebar height measurement ──
-        // On mobile the sidebar is position:fixed, so .fn-main needs a
-        // padding-top equal to the sidebar's rendered height. env() alone
-        // is unreliable (Safari can return 0 initially), so we measure
-        // the actual offsetHeight after each render and write --fn-sidebar-h.
-        function setSidebarHeight() {
-            if (window.innerWidth > 900) return;
-            const sidebar = document.querySelector('[id^="fn-sidebar"]');
-            if (!sidebar) return;
-            const h = sidebar.offsetHeight;
-            document.documentElement.style.setProperty('--fn-sidebar-h', h + 'px');
         }
 
         // ── Dropdown (click on mobile) ──
@@ -659,8 +649,6 @@
             renderIndex();
             lenis.scrollTo(0, { immediate: true });
         }
-
-        window.addEventListener('resize', setSidebarHeight);
 
         // Browser back/forward
         window.addEventListener('popstate', e => {

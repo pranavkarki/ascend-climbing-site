@@ -903,40 +903,43 @@
 /* ─── BREAKPOINT: MOBILE ──────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-    .fn-app, .fn-view {
-        grid-template-columns: 1fr;
-        min-height: auto;
-    }
-
-    /* Sidebar collapses to fixed horizontal top strip.
-       position:fixed (not sticky) is used because sticky inside CSS Grid
-       is unreliable in Safari mobile. fixed is anchored to the viewport
-       so it always covers the Dynamic Island zone.
-       JS measures the rendered height and sets --fn-sidebar-h so .fn-main
-       can offset itself — no reliance on env() for layout safety. */
-    .fn-sidebar {
+    /* .fn-view is a fixed full-viewport pane that scrolls its OWN content, so
+       content is clipped at the pane's top edge and can't travel up under the
+       status bar. Required because in this page (unlike a bare page) window-
+       scrolled content bleeds under the translucent status bar in iOS Safari —
+       likely an interaction with the global body styles in styles.css. Scrolling
+       inside the pane sidesteps it. The opaque `black` status bar (see head)
+       means the PWA also sits below the status bar, so no env padding is needed
+       and the header isn't pushed down. */
+    .fn-view {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        width: 100%;
+        bottom: 0;
+        display: block;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Sidebar: sticky, opaque dark top strip at the top of the pane. */
+    .fn-sidebar {
+        position: sticky;
+        top: 0;
         height: auto;
         flex-direction: row;
         align-items: center;
         flex-wrap: nowrap;
         gap: 10px;
         padding: 10px 16px;
-        padding-top: env(safe-area-inset-top, 10px);
         border-right: 0;
         border-bottom: 0.5pt solid var(--line-color);
         overflow-x: auto;
         overflow-y: visible;
         scrollbar-width: none;
         z-index: 100;
-    }
-    /* PWA: floor guards against iOS caching env() as 0 on shortcuts */
-    html.pwa-standalone .fn-sidebar {
-        padding-top: max(env(safe-area-inset-top), 59px);
     }
     .fn-sidebar::-webkit-scrollbar { display: none; }
     /* Allow dropdown to escape the sidebar's overflow on mobile */
@@ -1002,8 +1005,8 @@
     }
     .fn-esc-hint { display: none; }
 
-    /* Main area — padding-top is controlled by --fn-sidebar-h (set by JS) */
-    .fn-main { padding: var(--fn-sidebar-h, 74px) 16px 80px; }
+    /* Main area — sidebar is sticky (in flow), so no top offset needed */
+    .fn-main { padding: 18px 16px 80px; }
 
     /* Hero: single column */
     .fn-hero { grid-template-columns: 1fr; padding: 28px 0 22px; gap: 12px; }
