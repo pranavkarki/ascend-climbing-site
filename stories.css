@@ -1051,7 +1051,9 @@
     .fn-sidebar .fn-sidebar-index-meta,
     .fn-sidebar .fn-toc,
     .fn-sidebar .fn-article-details,
-    .fn-sidebar .fn-share-line { display: none; }
+    .fn-sidebar .fn-share-line,
+    .fn-sidebar .fn-toc-box,
+    .fn-sidebar .fn-nav-label { display: none; }
 
     /* Move NAV button into the sidebar strip; hide it from the top-bar */
     .fn-top-bar .fn-topnav-wrap { display: none; }
@@ -1059,7 +1061,7 @@
     .fn-sidebar .fn-topnav-btn {
         height: auto;
         padding: 5px 6px 4px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 500;
         letter-spacing: 0.04em;
         gap: 0.5em;
