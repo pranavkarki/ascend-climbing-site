@@ -918,12 +918,20 @@
         flex-wrap: nowrap;
         gap: 10px;
         padding: 10px 16px;
+        /* viewport-fit=cover extends the viewport into the DI zone on all
+           browsers. Override padding-top after the shorthand so env() wins. */
+        padding-top: env(safe-area-inset-top, 10px);
         border-right: 0;
         border-bottom: 0.5pt solid var(--line-color);
         overflow-x: auto;
         overflow-y: visible;
         scrollbar-width: none;
         z-index: 100;
+    }
+    /* PWA: floor guards against iOS caching env() as 0 on shortcuts */
+    html.pwa-standalone .fn-sidebar {
+        top: 0;
+        padding-top: max(env(safe-area-inset-top), 59px);
     }
     .fn-sidebar::-webkit-scrollbar { display: none; }
     /* Allow dropdown to escape the sidebar's overflow on mobile */

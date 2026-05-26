@@ -262,30 +262,24 @@ header {
        because sticky + z-index creates its own stacking context */
 }
 
-/* In standalone PWA mode the header covers the Dynamic Island zone with its
-   background so scrolled content can't bleed behind the island. padding-top
-   pushes the nav-row below the DI; top: 0 makes the header stick flush to
-   the viewport top so there is no gap. The header background (#0e0e0e)
-   matches the page background, so the DI zone is seamless.
-   max(env(...), 59px) guards against iOS PWA shortcut caching env() as 0. */
+/* viewport-fit=cover lets content bleed into the safe-area on ALL browsers
+   (Safari mobile included, not just PWA). Any sticky element at top:0 must
+   add padding-top: env(safe-area-inset-top) so its background covers the DI
+   zone.
+
+   PWA-standalone also needs top:0 (header default is top:0.75rem) and a 59px
+   floor — iOS PWA shortcuts sometimes cache env() as 0, so the floor prevents
+   a gap. Regular Safari resolves env() correctly so no floor is needed. */
+header {
+    padding-top: env(safe-area-inset-top, 0px);
+}
 html.pwa-standalone header {
     padding-top: max(env(safe-area-inset-top), 59px);
     top: 0;
 }
 
-/* stories.html: mobile sidebar acts as the sticky top nav.
-   Push it below the Dynamic Island and give it a solid background. */
-@media (max-width: 900px) {
-    /* Same pattern as the main-site header: top:0 + padding-top covers the DI
-       zone with the sidebar's own background so scrolled content can't bleed
-       through. Using padding-top (not top offset) is key — top offset just
-       moves the snap point, leaving an uncovered gap above. */
-    html.pwa-standalone .fn-sidebar {
-        top: 0;
-        padding-top: max(env(safe-area-inset-top), 59px);
-        background-color: var(--bg-color);
-    }
-}
+/* stories.html sidebar safe-area rules are in stories.css (after its
+   padding shorthand) so the load order doesn't clobber padding-top. */
 
 
 .nav-row {
