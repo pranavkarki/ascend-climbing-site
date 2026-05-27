@@ -146,6 +146,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updateHeaderHeight);
     window.addEventListener('load', updateHeaderHeight);
 
+    const updateNavLinksLeft = () => {
+        const brand = document.querySelector('.nav-brand');
+        const meta = document.querySelector('.nav-meta');
+        const navLinks = document.querySelector('.nav-links');
+        if (!brand || !meta || !navLinks) return;
+        const mid = (brand.getBoundingClientRect().right + meta.getBoundingClientRect().left) / 2;
+        navLinks.style.left = mid + 'px';
+    };
+    updateNavLinksLeft();
+    window.addEventListener('resize', updateNavLinksLeft);
+    window.addEventListener('load', updateNavLinksLeft);
+
     const header = document.querySelector('header');
     const navLinksEl = document.querySelector('.nav-links');
     const landingEl = document.getElementById('landing');
@@ -285,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cinematicCharReveal(document.getElementById('pricing-section-header'));
     cinematicCharReveal(document.getElementById('activities-section-header'));
     cinematicCharReveal(document.getElementById('features-section-header'));
+    cinematicCharReveal(document.getElementById('faq-section-header'));
 
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -566,5 +579,49 @@ document.addEventListener('DOMContentLoaded', () => {
         renderDots();
         autoTimer = setInterval(() => goTo(current + 1), 8000);
     })();
+
+    // FAQ: category tab switching
+    document.querySelectorAll('.faq-nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.faqNav;
+
+            // Deactivate all nav items and panels; reset open questions in leaving panel
+            document.querySelectorAll('.faq-nav-item').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.faq-panel').forEach(panel => {
+                panel.querySelectorAll('.faq-item.open').forEach(item => {
+                    item.classList.remove('open');
+                    item.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+                    item.querySelector('.faq-answer').style.maxHeight = '0';
+                });
+                panel.classList.remove('active');
+            });
+
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            document.querySelector(`.faq-panel[data-faq-panel="${id}"]`).classList.add('active');
+        });
+    });
+
+    // FAQ: individual question accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.closest('.faq-item');
+            const answer = item.querySelector('.faq-answer');
+            const isOpen = item.classList.contains('open');
+
+            if (isOpen) {
+                item.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+                answer.style.maxHeight = '0';
+            } else {
+                item.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+            }
+        });
+    });
 
 });

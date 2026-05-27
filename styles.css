@@ -293,21 +293,27 @@ html.pwa-standalone header {
 
 /* Needs higher specificity than .grid-row.compact to override its padding: 1rem 0 */
 .grid-row.nav-row {
-    padding: 0.4rem 1.1rem;
+    padding: 0.75rem 1.1rem;
 }
 
 .nav-brand {
     position: relative;
     z-index: 1;
+    font-family: 'Gandur New', 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    font-weight: 300;
+    text-transform: none;
 }
 
 .nav-links {
     /* Direct child of <body> (moved out of <header> so position:fixed can escape
        the sticky parent's box on iOS WebKit). On desktop, position over the nav-row
-       using the header's sticky offset + half the measured header height. */
+       using the header's sticky offset + half the measured header height.
+       left is overridden by updateNavLinksLeft() in main.js to sit centered
+       between .nav-brand and .nav-meta. */
     position: fixed;
     top: calc(0.75rem + var(--header-height, 72px) / 2);
-    left: 33.333vw;
+    left: 40%;
     transform: translate(-50%, -50%);
     display: flex;
     gap: 1.5rem;
@@ -368,7 +374,6 @@ body.header-scrolled .nav-links {
 
 header.scrolled .nav-row {
     background-color: #0000CD;
-    border-radius: 7px;
     box-shadow: 0 2px 24px rgba(0, 0, 0, 0.12);
 }
 
@@ -455,15 +460,15 @@ header.scrolled .nav-brand:hover {
 }
 
 .landing-geo {
-    width: clamp(90px, 23vw, 190px);
+    width: clamp(60px, 15vw, 120px);
     color: var(--text-color);
-    margin-bottom: 0.75rem;
+    margin-bottom: 2rem;
     overflow: visible;
 }
 
 .landing-brand {
     font-family: 'Gandur New', 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 14vw, 200px);
+    font-size: clamp(48px, 9vw, 140px);
     font-weight: 300;
     text-transform: uppercase;
     padding: 0 var(--gutter);
@@ -476,8 +481,8 @@ header.scrolled .nav-brand:hover {
 
 
 .landing-climbing-sub {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-color);
@@ -844,7 +849,6 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     padding: 0 0.8em 0 1em;
     gap: 1.2em;
     margin-top: calc(14px * 1.5);
-    border-radius: 8px;
     background: var(--text-color);
     color: var(--bg-color);
     font-family: var(--font-mono);
@@ -1649,5 +1653,324 @@ a.footer-bb-cell:hover  { background: rgba(250, 250, 250, 0.10); }
     .menu-row {
         font-size: 0.8125rem;
         margin-bottom: 0.25rem;
+    }
+}
+
+
+/* ===================== FAQ ===================== */
+#faq {
+    padding-bottom: 6rem;
+}
+
+/* Two-column layout: nav left, panels right */
+.faq-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    margin-top: 1.5rem;
+    align-items: start;
+}
+
+/* Left column — category list */
+.faq-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-right: var(--line-thickness) solid rgba(250, 250, 250, 0.2);
+    padding-right: 2rem;
+    padding-top: 1.5rem;
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+}
+
+/* Pill-style category buttons — matches stories .fn-pill language */
+.faq-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 0.5pt solid #2a2a2a;
+    width: 100%;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 120ms linear, background 120ms linear, color 120ms linear;
+    line-height: 1.4;
+}
+
+.faq-nav-item:hover { border-color: var(--text-color); }
+
+.faq-nav-item.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--bg-color);
+}
+
+.faq-pill-left { display: flex; align-items: center; gap: 10px; }
+
+.faq-pill-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border: 1px solid currentColor;
+    flex: 0 0 7px;
+}
+.faq-nav-item.active .faq-pill-dot {
+    background: var(--bg-color);
+    border-color: var(--bg-color);
+}
+
+.faq-cat-name {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.faq-pill-count {
+    color: #909090;
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+}
+.faq-nav-item.active .faq-pill-count { color: var(--bg-color); }
+
+/* Right column — question panels */
+.faq-panels {
+    padding-left: 3rem;
+    border-top: none;
+}
+
+.faq-panel {
+    display: none;
+}
+
+.faq-panel.active {
+    display: block;
+}
+
+/* Panel hero header — mirrors stories fn-hero pattern */
+.faq-panel-header {
+    padding: 1.5rem 0 1.25rem;
+    border-bottom: var(--line-thickness) solid rgba(250, 250, 250, 0.15);
+    margin-bottom: 0;
+}
+
+.faq-panel-num {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #909090;
+    margin-bottom: 10px;
+}
+
+.faq-panel-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--text-color);
+    margin: 0 0 8px;
+}
+
+.faq-panel-qs {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #909090;
+    margin: 0;
+}
+
+/* Individual question rows */
+.faq-item {
+    border-top: var(--line-thickness) solid rgba(250, 250, 250, 0.2);
+}
+
+.faq-item:last-child {
+    border-bottom: var(--line-thickness) solid rgba(250, 250, 250, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 400;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 0;
+    cursor: pointer;
+    gap: 1rem;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+}
+
+.faq-question:hover {
+    color: rgba(250, 250, 250, 0.6);
+}
+
+.faq-toggle {
+    flex-shrink: 0;
+    font-size: 16px;
+    line-height: 1;
+    font-family: var(--font-mono);
+    color: rgba(250, 250, 250, 0.5);
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+}
+
+.faq-item.open .faq-toggle {
+    transform: rotate(45deg);
+    color: var(--color-accent);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-answer-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    padding: 0.25rem 0 1.25rem;
+}
+
+.faq-answer-inner p {
+    grid-column: 2;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(250, 250, 250, 0.75);
+}
+
+.faq-answer-inner p + p {
+    margin-top: 0.6rem;
+}
+
+.faq-ans-label {
+    color: var(--color-accent);
+}
+
+.faq-answer-inner a {
+    color: var(--color-accent);
+    position: static;
+}
+
+.faq-answer-inner a::before {
+    display: none;
+}
+
+/* Pricing tables inside FAQ answers */
+.faq-table {
+    grid-column: 2;
+    margin-top: 0.75rem;
+    width: 100%;
+}
+
+.faq-table-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1.8fr;
+    gap: 0.5rem 1.5rem;
+    padding: 0.55rem 0;
+    border-top: var(--line-thickness) solid rgba(250, 250, 250, 0.15);
+    font-size: 13px;
+    color: rgba(250, 250, 250, 0.75);
+}
+
+.faq-table-head {
+    color: var(--color-accent);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.faq-table-note {
+    grid-column: 2;
+    font-size: 12px;
+    color: rgba(250, 250, 250, 0.4);
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 992px) {
+    /* Stack to single column: nav row on top, panels below */
+    .faq-body {
+        grid-template-columns: 1fr;
+    }
+
+    .faq-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-right: none;
+        border-bottom: var(--line-thickness) solid rgba(250, 250, 250, 0.2);
+        padding-right: 0;
+        padding-top: 0;
+        padding-bottom: 12px;
+        position: static;
+        gap: 6px;
+    }
+
+    .faq-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .faq-nav-item {
+        flex-shrink: 0;
+        width: auto;
+        padding: 7px 10px;
+    }
+
+    /* Hide count on mobile to keep pills compact */
+    .faq-pill-count { display: none; }
+
+    .faq-nav-item.active {
+        background: var(--color-accent);
+        border-color: var(--color-accent);
+        color: var(--bg-color);
+    }
+
+    .faq-panels {
+        padding-left: 0;
+        padding-top: 0.5rem;
+    }
+
+    .faq-answer-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .faq-answer-inner p,
+    .faq-table,
+    .faq-table-note {
+        grid-column: 1;
+    }
+
+    .faq-table-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .faq-table-row > span:last-child {
+        grid-column: 1 / -1;
+        color: rgba(250, 250, 250, 0.45);
+        font-size: 12px;
+    }
+
+    .faq-table-head > span:last-child {
+        color: var(--color-accent);
     }
 }
