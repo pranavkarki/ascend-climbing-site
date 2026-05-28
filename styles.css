@@ -1,7 +1,21 @@
 @font-face {
     font-family: 'Gandur New';
-    src: url('fonts/Gandur New-Light.otf') format('opentype');
+    src: url('fonts/GandurNew-Light.otf') format('opentype');
     font-weight: 300;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: 'Gandur New';
+    src: url('fonts/GandurNew-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: block;
+}
+@font-face {
+    font-family: 'Gandur New';
+    src: url('fonts/GandurNew-Bold.otf') format('opentype');
+    font-weight: 700;
     font-style: normal;
     font-display: block;
 }
