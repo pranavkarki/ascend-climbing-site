@@ -97,9 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (img) {
             gsap.set(img, { clipPath: 'inset(100% 0% 0% 0%)', filter: 'blur(2px)', scale: 1.03, opacity: 1 });
-            gsap.timeline({ scrollTrigger: scrollTriggerConfig })
-                .to(img, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'power3.out' })
-                .to(img, { filter: 'blur(0px)', scale: 1.01, duration: 0.2, ease: 'power2.out', clearProps: 'filter' });
+            const setupAnim = () => {
+                gsap.timeline({ scrollTrigger: scrollTriggerConfig })
+                    .to(img, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'power3.out' })
+                    .to(img, { filter: 'blur(0px)', scale: 1.01, duration: 0.2, ease: 'power2.out', clearProps: 'filter' });
+            };
+            if (img.complete) {
+                setupAnim();
+            } else {
+                img.addEventListener('load', setupAnim, { once: true });
+            }
         } else {
             gsap.set(wrap, { clipPath: 'inset(100% 0% 0% 0%)' });
             gsap.to(wrap, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'power3.out', scrollTrigger: scrollTriggerConfig });

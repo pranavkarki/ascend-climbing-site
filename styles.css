@@ -442,7 +442,7 @@ header.scrolled .nav-brand:hover {
     padding-top: var(--header-height);
     padding-bottom: 0;
     position: relative;
-    background-image: url('img/optimized/wall.jpg');
+    background-image: url('img/optimized/wall.avif');
     background-size: cover;
     background-position: center 33%;
     background-repeat: no-repeat;
