@@ -211,54 +211,57 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Gate the entire entrance on the hero image being ready so elements
-    // don't animate in over a blank dark screen. window.load is the fallback
-    // so it never hangs on a failed/slow image.
-    // Pre-set the wipe "from" state synchronously (whole image hidden, revealed
-    // from the bottom) so there's no flash before startEntrance runs.
+    // The LCP element is h1.landing-brand. Reveal the nav + landing text
+    // IMMEDIATELY (not gated on the hero image) so the largest contentful paint
+    // doesn't wait on a network image — that gating was the main LCP killer.
+    // Only the image wipe below stays gated on the image's load.
     const landingBg = document.querySelector('.landing-bg');
+    // Pre-set the wipe "from" state synchronously (whole image hidden, revealed
+    // from the bottom) so there's no flash before the wipe runs.
     gsap.set(landingBg, { clipPath: 'inset(100% 0% 0% 0%)' });
 
-    let entranceStarted = false;
-    const startEntrance = () => {
-        if (entranceStarted) return;
-        entranceStarted = true;
+    // --- Immediate text/nav entrance (LCP path) ---
+    // Header + nav-links share a single timeline so both tween on identical frames.
+    // Standalone tweens with the same delay can drift by a frame; the timeline locks them together.
+    const navEntrance = gsap.timeline({
+        delay: 0.1,
+        onComplete: () => {
+            entranceDone = true;
+            lastScrollY = window.scrollY;
 
-        // Wipe the hero background up from the bottom, in sync with the reveal.
-        gsap.to(landingBg, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power3.out' });
-
-        // Header + nav-links share a single timeline so both tween on identical frames.
-        // Standalone tweens with the same delay can drift by a frame; the timeline locks them together.
-        const navEntrance = gsap.timeline({
-            delay: 0.1,
-            onComplete: () => {
-                entranceDone = true;
-                lastScrollY = window.scrollY;
-
-                // Snap scroll classes to their correct state after entrance.
-                const scrolled = window.scrollY > CONFIG.SCROLL_THRESHOLD;
-                header.classList.toggle('scrolled', scrolled);
-                document.body.classList.toggle('header-scrolled', scrolled);
-            }
-        });
-        navEntrance.to(header, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
-        if (window.matchMedia(`(min-width: ${CONFIG.MOBILE_BREAKPOINT + 1}px)`).matches) {
-            navEntrance.to('.nav-links', { xPercent: -50, yPercent: -50, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
+            // Snap scroll classes to their correct state after entrance.
+            const scrolled = window.scrollY > CONFIG.SCROLL_THRESHOLD;
+            header.classList.toggle('scrolled', scrolled);
+            document.body.classList.toggle('header-scrolled', scrolled);
         }
-        gsap.to('.menu-toggle', { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
+    });
+    navEntrance.to(header, { yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
+    if (window.matchMedia(`(min-width: ${CONFIG.MOBILE_BREAKPOINT + 1}px)`).matches) {
+        navEntrance.to('.nav-links', { xPercent: -50, yPercent: -50, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0);
+    }
+    gsap.to('.menu-toggle', { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out', delay: 0.8, clearProps: 'transform' });
 
-        gsap.timeline({ delay: 0.5, onComplete: startHeroIdleAnimations })
-            .to('.landing-geo',          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' })
-            .to('.landing-brand',        { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, '-=0.3')
-            .to('.landing-climbing-sub', { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.4')
-            .to('.landing-tagline',      { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.3');
+    gsap.timeline({ delay: 0.5, onComplete: startHeroIdleAnimations })
+        .to('.landing-geo',          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' })
+        .to('.landing-brand',        { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, '-=0.3')
+        .to('.landing-climbing-sub', { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+        .to('.landing-tagline',      { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.3');
+
+    // --- Image wipe (gated on the hero image being ready) ---
+    // window.load is the fallback so it never hangs on a failed/slow image.
+    let wipeStarted = false;
+    const startHeroWipe = () => {
+        if (wipeStarted) return;
+        wipeStarted = true;
+        // Wipe the hero background up from the bottom.
+        gsap.to(landingBg, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power3.out' });
     };
 
     if (landingBg.complete) {
-        startEntrance();
+        startHeroWipe();
     } else {
-        landingBg.addEventListener('load', startEntrance, { once: true });
-        window.addEventListener('load', startEntrance, { once: true });
+        landingBg.addEventListener('load', startHeroWipe, { once: true });
+        window.addEventListener('load', startHeroWipe, { once: true });
     }
 
     const scrambleChars = CONFIG.SCRAMBLE_CHARS;
