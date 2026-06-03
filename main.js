@@ -211,13 +211,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Gate the entire entrance on the hero background being ready so elements
+    // Gate the entire entrance on the hero image being ready so elements
     // don't animate in over a blank dark screen. window.load is the fallback
     // so it never hangs on a failed/slow image.
+    // Pre-set the wipe "from" state synchronously (whole image hidden, revealed
+    // from the bottom) so there's no flash before startEntrance runs.
+    const landingBg = document.querySelector('.landing-bg');
+    gsap.set(landingBg, { clipPath: 'inset(100% 0% 0% 0%)' });
+
     let entranceStarted = false;
     const startEntrance = () => {
         if (entranceStarted) return;
         entranceStarted = true;
+
+        // Wipe the hero background up from the bottom, in sync with the reveal.
+        gsap.to(landingBg, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'power3.out' });
 
         // Header + nav-links share a single timeline so both tween on identical frames.
         // Standalone tweens with the same delay can drift by a frame; the timeline locks them together.
@@ -246,12 +254,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .to('.landing-tagline',      { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, '-=0.3');
     };
 
-    const heroImg = new Image();
-    heroImg.src = 'img/optimized/wall.avif';
-    if (heroImg.complete) {
+    if (landingBg.complete) {
         startEntrance();
     } else {
-        heroImg.addEventListener('load', startEntrance, { once: true });
+        landingBg.addEventListener('load', startEntrance, { once: true });
         window.addEventListener('load', startEntrance, { once: true });
     }
 
