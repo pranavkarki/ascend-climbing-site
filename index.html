@@ -527,29 +527,29 @@
             <div class="faq-body scroll-section">
 
                 <!-- Category nav — left column -->
-                <nav class="faq-nav" aria-label="FAQ categories">
-                    <button class="faq-nav-item active animate-up" data-faq-nav="001" aria-selected="true">
+                <nav class="faq-nav" aria-label="FAQ categories" role="tablist">
+                    <button class="faq-nav-item active animate-up" data-faq-nav="001" role="tab" aria-selected="true" aria-controls="faq-panel-001">
                         <span class="faq-pill-left">
                             <span class="faq-pill-dot"></span>
                             <span class="faq-cat-name">FAQ</span>
                         </span>
                         <span class="faq-pill-count">02</span>
                     </button>
-                    <button class="faq-nav-item animate-up delay-1" data-faq-nav="002" aria-selected="false">
+                    <button class="faq-nav-item animate-up delay-1" data-faq-nav="002" role="tab" aria-selected="false" aria-controls="faq-panel-002">
                         <span class="faq-pill-left">
                             <span class="faq-pill-dot"></span>
                             <span class="faq-cat-name">Pricing &amp; Gear</span>
                         </span>
                         <span class="faq-pill-count">05</span>
                     </button>
-                    <button class="faq-nav-item animate-up delay-2" data-faq-nav="003" aria-selected="false">
+                    <button class="faq-nav-item animate-up delay-2" data-faq-nav="003" role="tab" aria-selected="false" aria-controls="faq-panel-003">
                         <span class="faq-pill-left">
                             <span class="faq-pill-dot"></span>
                             <span class="faq-cat-name">Young Climbers</span>
                         </span>
                         <span class="faq-pill-count">02</span>
                     </button>
-                    <button class="faq-nav-item animate-up delay-2" data-faq-nav="004" aria-selected="false">
+                    <button class="faq-nav-item animate-up delay-2" data-faq-nav="004" role="tab" aria-selected="false" aria-controls="faq-panel-004">
                         <span class="faq-pill-left">
                             <span class="faq-pill-dot"></span>
                             <span class="faq-cat-name">Location &amp; Logistics</span>
@@ -562,7 +562,7 @@
                 <div class="faq-panels">
 
                     <!-- [001] FAQ -->
-                    <div class="faq-panel active" data-faq-panel="001" role="tabpanel">
+                    <div class="faq-panel active" data-faq-panel="001" role="tabpanel" id="faq-panel-001">
 
                         <div class="faq-panel-header">
                             <span class="faq-panel-num">[001]</span>
@@ -598,7 +598,7 @@
                     </div>
 
                     <!-- [002] Pricing & Gear -->
-                    <div class="faq-panel" data-faq-panel="002" role="tabpanel">
+                    <div class="faq-panel" data-faq-panel="002" role="tabpanel" id="faq-panel-002">
 
                         <div class="faq-panel-header">
                             <span class="faq-panel-num">[002]</span>
@@ -715,7 +715,7 @@
                     </div>
 
                     <!-- [003] Policies for Young Climbers -->
-                    <div class="faq-panel" data-faq-panel="003" role="tabpanel">
+                    <div class="faq-panel" data-faq-panel="003" role="tabpanel" id="faq-panel-003">
 
                         <div class="faq-panel-header">
                             <span class="faq-panel-num">[003]</span>
@@ -751,7 +751,7 @@
                     </div>
 
                     <!-- [004] Location & Logistics -->
-                    <div class="faq-panel" data-faq-panel="004" role="tabpanel">
+                    <div class="faq-panel" data-faq-panel="004" role="tabpanel" id="faq-panel-004">
 
                         <div class="faq-panel-header">
                             <span class="faq-panel-num">[004]</span>
