@@ -18,7 +18,7 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
 | `img/square/` | 9 photos (currently unused) |
-| `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif`, `rock-day.avif` (Rock Day section), `training-room.avif` |
+| `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif` (pre-cropped to 4:3 1440×1080 to match its `.feature-img-wrap` box — don't replace with a portrait source or `object-fit: cover` will crop + waste bytes), `rock-day.avif` (Rock Day section), `training-room.avif` |
 | `img/stories/` | Cover images for Field Notes posts (`[slug].jpg`). Referenced by `img` field in `posts.js`. |
 | `img/site-favicon.svg` | Favicon (white circle + dark star) |
 | `fonts/Gandur New-Light.otf` | Local brand display font |
