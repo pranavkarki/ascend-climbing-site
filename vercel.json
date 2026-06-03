@@ -1,3 +1,9 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/cafe.html",    "destination": "/cafe",    "permanent": true },
+    { "source": "/stories.html", "destination": "/stories", "permanent": true },
+    { "source": "/index.html",   "destination": "/",        "permanent": true },
+    { "source": "/favicon.ico",  "destination": "/img/site-favicon-32.png", "permanent": true }
+  ]
 }

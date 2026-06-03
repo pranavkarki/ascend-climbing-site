@@ -10,7 +10,7 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → About → Footer |
+| `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → FAQ → About → Footer |
 | `cafe.html` | Standalone cafe menu page |
 | `stories.html` | Field Notes page: blog/events/rock-day listing + inline article view. All JS is inline. Loads `posts.js` then renders everything via vanilla JS. |
 | `stories.css` | All styles for the Field Notes page. Scoped to `.fn-*` to avoid collision with `styles.css`. `.fn-view` is the grid container (260px sidebar + 1fr main). |
@@ -53,6 +53,8 @@ Aesthetic: brutalist/minimal, dark, monospace.
 - Entrance animations use `gsap.to()`, **not** `gsap.from()` — body starts at `opacity:0` and JS pre-sets the "from" states in one sync tick to prevent a flash. See the comment at the top of `main.js`.
 - `body` uses `overflow-x: clip` (not `hidden`) so child `overflow: visible` (SVG animations) isn't clipped.
 - `.feature-index` green `[001]` labels restart numbering per section.
+- FAQ answers use `max-height: 0; overflow: hidden` (not `display: none`) so answer text stays in the DOM and is crawlable. A `FAQPage` JSON-LD schema block in `<head>` supplements this for rich results. Do NOT change to `display: none`.
+- FAQ layout is a **two-column tab design**: `.faq-nav` (left, sticky) lists categories; `.faq-panels` (right) shows one active `.faq-panel` at a time. Switching categories is instant `display: none/block` — no max-height needed on panels. Only individual `.faq-answer` elements use the max-height accordion. On ≤992px the nav becomes a horizontal scrollable pill row above the panel. Do NOT revert to nested accordion-of-accordions (the old design clipped questions behind the next section when max-height wasn't updated correctly).
 - `id="about"` lives on the `<section>` before the footer, NOT on `<footer>` — the footer nav link `href="#about"` targets this section. Do not move it back to the footer.
 - `.about-body` — shared style for the About section paragraph and the Activities intro paragraph. Spans grid columns 1–2, uppercase, 14px, muted colour. Used as a direct child of `.grid-row`.
 - Scroll past 200px toggles **both** `header.scrolled` and `body.header-scrolled` (the latter scopes nav link-color since `.nav-links` lives outside the header).
@@ -71,6 +73,7 @@ Aesthetic: brutalist/minimal, dark, monospace.
 - Hamburger menu — toggles `.active` / `.mobile-active` / `body.menu-open`; close clip-path tween restores scroll-hide state in its `onComplete`.
 - `initTestimonialsCarousel()` — renders from a `REVIEWS` array (6 reviews; each `parts` item is `{t}` or `{d,t}` where `d` ∈ pill/outline/oval/sparkle/wave/underline → `.t-*` spans). Measures the tallest slide to fix `min-height` (prevents layout shift). Auto-rotates 8s; arrow keys when in view.
 - `updateHeaderHeight()` — writes `--header-height` on load + resize.
+- FAQ (inline at bottom of `DOMContentLoaded`) — two parts: (1) `.faq-nav-item` click switches the active `.faq-panel` (tab-style, collapses open questions in the leaving panel); (2) `.faq-question` click toggles `.open` on `.faq-item`, sets `answer.style.maxHeight` to `scrollHeight` on open and `0` on close. `+` icon rotates 45° via CSS to form `×` when open.
 
 ---
 
