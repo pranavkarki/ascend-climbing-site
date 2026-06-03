@@ -19,7 +19,7 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
 | `img/square/` | 9 photos (currently unused) |
 | `img/optimized/` | `wall.jpg` (hero bg), `cafe.avif` (pre-cropped to 4:3 1440×1080 to match its `.feature-img-wrap` box — don't replace with a portrait source or `object-fit: cover` will crop + waste bytes), `rock-day.avif` (Rock Day section), `training-room.avif` |
-| `img/stories/` | Cover images for Field Notes posts (`[slug].jpg`). Referenced by `img` field in `posts.js`. |
+| `img/stories/` | Cover images for Field Notes posts (`[slug].avif`, AVIF). Referenced by the `img` field in `posts.js`. Each cover serves **two fixed boxes** via `object-fit: cover`: the article hero `.fn-hero-img` (full-width × **440px**, force-grayscaled in CSS) and the list hover thumb `.fn-thumb` (**112×112** square). A landscape source ~1200–1600px wide crops best to both; tall portraits get center-cropped to a band (face/upper-body survives, top+bottom lost — and the cropped-off pixels waste filesize, same caveat as `cafe.avif`). Don't bake grayscale into the file (CSS does it). Encode recipe: `sips --resampleWidth 1200 src.jpg --out /tmp/x.jpg && avifenc -q 32 -s 0 /tmp/x.jpg img/stories/[slug].avif` → ~140KB. |
 | `img/site-favicon.svg` | Favicon (white circle + dark star) |
 | `fonts/Gandur New-Light.otf` | Local brand display font |
 | `ref/` | Course images, logo, reference screenshots |

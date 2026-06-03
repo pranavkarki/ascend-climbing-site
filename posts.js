@@ -42,7 +42,7 @@ const POSTS = [
     title: "Himalayan Open Vol. 2 — Bouldering Competition",
     excerpt: "20 boulders, two days, three rounds. 2000 NPR entry — registration closes 15 July.",
     read: "3 min",
-    img: "img/stories/boulder-brawl.jpg",   // replace with real photo
+    img: "img/stories/boulder-brawl.avif",
     pinned: true,
     tag: "Gym // Main Wall",
     details: {
