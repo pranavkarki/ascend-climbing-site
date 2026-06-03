@@ -467,7 +467,7 @@ header.scrolled .nav-brand:hover {
     z-index: 1;
 }
 
-#landing > * {
+#landing > *:not(.landing-bg) {
     position: relative;
     z-index: 2;
 }
