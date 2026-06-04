@@ -107,6 +107,18 @@ Aesthetic: brutalist/minimal, dark, monospace.
 
 ---
 
+## Security (headers + SRI)
+
+Pure static site: no backend, forms, auth, secrets, or API keys, so attack surface is small. Hardening lives in two places — **read this before adding any external resource or new browser feature**, or the page will break.
+
+- **CSP & security headers** are set in `vercel.json` under the `headers` block, applied to all routes (`/(.*)`). They include `Content-Security-Policy`, `Strict-Transport-Security` (HSTS, 2yr + includeSubDomains, **no `preload`** — preload is a hard-to-undo commitment, add it deliberately later if ever), `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, and `Permissions-Policy`.
+- **CSP allowlist is tight — adding an external resource means editing the CSP.** Current allowed origins: scripts from `cdn.jsdelivr.net` + `cdnjs.cloudflare.com`; styles from `fonts.googleapis.com`; fonts from `fonts.gstatic.com`; images `self` + `data:`. `script-src`/`style-src` keep `'unsafe-inline'` because the site has inline `<script>` (PWA flag in `index.html`, the SPA in `stories.html`) and inline `style=` attributes everywhere. If you ever add an embed (YouTube/map/analytics/a new CDN/a webfont host), you **must** add its origin to the matching CSP directive or the browser will block it silently (check the console for CSP violations).
+- **`Permissions-Policy` disables powerful features the site doesn't use** (camera, microphone, geolocation, payment, usb, etc.; `fullscreen=(self)` is allowed). This is deliberate hardening — **if you add a feature that needs one of these (e.g. an embedded map = `geolocation`, a video that autoplays = `autoplay`), change that feature from `()` to `(self)` in the `Permissions-Policy` value in `vercel.json`**, otherwise the API will be unavailable.
+- **CDN scripts use Subresource Integrity (SRI):** every `<script src="https://cdn…">` (Lenis, GSAP, ScrollTrigger, SplitType) in `index.html`/`stories.html`/`cafe.html` carries a `integrity="sha384-…"` + `crossorigin="anonymous"`. If you **bump a CDN library version**, the old hash will no longer match and the script will refuse to load — recompute the hash: `curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A` and update the `integrity` attr in **all three** HTML files.
+- `.vercel/`, `.vercel-codes`, `.env*`, `.DS_Store` are gitignored and have never been committed (verified across full history). GitHub secret-scanning + push-protection are enabled on the public repo.
+
+---
+
 ## Pricing reference (NPR)
 
 - **Day Passes**: Boulder 900 · Full Experience (+shoes +belay) 1100
