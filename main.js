@@ -158,6 +158,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const meta = document.querySelector('.nav-meta');
         const navLinks = document.querySelector('.nav-links');
         if (!brand || !meta || !navLinks) return;
+        // Mobile (≤992px) turns .nav-links into a full-viewport overlay positioned
+        // via CSS (left: -200px). An inline left here would override that media-query
+        // rule and shove the overlay off-center to the right, so only set it on desktop.
+        if (window.matchMedia('(max-width: 992px)').matches) {
+            navLinks.style.left = '';
+            return;
+        }
         const mid = (brand.getBoundingClientRect().right + meta.getBoundingClientRect().left) / 2;
         navLinks.style.left = mid + 'px';
     };

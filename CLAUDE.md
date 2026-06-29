@@ -67,6 +67,7 @@ Aesthetic: brutalist/minimal, dark, monospace.
 ## JS map (`main.js` — all inside `DOMContentLoaded`; `gsap.registerPlugin(ScrollTrigger)` at top)
 
 - Header + `.nav-links` share **one** entrance timeline (same frames). Scroll-hide navbar = GSAP `y` tween on both elements with 30px hysteresis; frozen while menu is open/closing.
+- `updateNavLinksLeft()` — centers the desktop `.nav-links` between `.nav-brand` and `.nav-meta` via an **inline** `left`. It **must** bail (and clear `style.left = ''`) on ≤992px: the mobile overlay is centered by the media-query `left: -200px`, and an inline `left` outranks it and shoves the overlay off-center to the right. Don't remove the `matchMedia` guard.
 - `startHeroIdleAnimations()` — periodic triangle spin (`#geo-tri-a`) + circle bounce (`#geo-circle-tr`) on the landing SVG mark.
 - `updateNavDateTime()` — live `#nav-datetime` clock, `Asia/Kathmandu`.
 - Scroll reveals: `.scroll-section` → `.animate-up` children (y+opacity, stagger); `cinematicCharReveal()` blur+green-flicker on the 3 section headers; `.pass-price` blue→white flash; `.feature-img-wrap` and `.img-reveal-container` clip-path wipes. Feature images animate `scale: 1.03 → 1.01` (zoom-out depth); resting at `1.01` prevents sub-pixel blue-edge bleed. The ScrollTrigger trigger falls back to `.grid-row` for images not inside `.feature-item` (e.g. rock-day).
