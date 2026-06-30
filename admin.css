@@ -52,8 +52,17 @@ textarea { resize: vertical; min-height: 64px; }
 .cms-group > summary { cursor: pointer; padding: 12px 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; list-style: none; display: flex; justify-content: space-between; }
 .cms-group > summary::-webkit-details-marker { display: none; }
 .cms-group[open] > summary { border-bottom: 1px solid var(--cms-line); }
-.cms-group-body { padding: 14px; }
+.cms-group-body { padding: 4px 14px 14px; }
 .cms-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+
+/* Sub-category blocks within a group (e.g. Boulder Pass vs Full Experience) */
+.cms-subblock { border-top: 1px solid var(--cms-line); padding: 16px 0 2px; }
+.cms-subblock:first-child { border-top: none; padding-top: 6px; }
+.cms-subhead { color: var(--cms-accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; margin-bottom: 12px; }
+.cms-subblock .cms-field { margin-bottom: 12px; }
+.cms-subblock .cms-field:last-child { margin-bottom: 2px; }
+/* keep price/short inputs from stretching the full width — easier to scan */
+.cms-subblock .cms-field input { max-width: 360px; }
 .cms-dirty input, .cms-dirty textarea { border-color: var(--cms-blue); }
 .cms-badge { color: var(--cms-accent); font-size: 11px; }
 

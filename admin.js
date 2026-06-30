@@ -119,27 +119,40 @@
     CMS_FIELDS.groups.forEach((g, gi) => {
       const det = h(`<details class="cms-group" ${gi === 0 ? "open" : ""}>
         <summary>${esc(g.label)} <span class="cms-badge" data-count></span></summary>
-        <div class="cms-group-body cms-grid2"></div>
+        <div class="cms-group-body"></div>
       </details>`);
-      const grid = det.querySelector(".cms-group-body");
+      const gbody = det.querySelector(".cms-group-body");
+
+      // Cluster fields by their `sub` label (preserving order) so each
+      // sub-category (Boulder vs Full Experience, each age group, …) renders
+      // as its own clearly separated block, fields stacked one per line.
+      const order = []; const bySub = {};
       g.fields.forEach((f) => {
-        const val = original[f.key] != null ? original[f.key] : "";
-        const big = f.type === "textarea";
-        const field = h(`<div class="cms-field" data-key="${esc(f.key)}">
-          <label>${esc(f.label)}</label>
-          ${big
-            ? `<textarea rows="3"></textarea>`
-            : `<input type="text" value="${esc(val)}">`}
-        </div>`);
-        const input = field.querySelector(big ? "textarea" : "input");
-        if (big) input.value = val;
-        input.addEventListener("input", () => {
-          const dirty = input.value !== val;
-          field.classList.toggle("cms-dirty", dirty);
-          updateCount(det);
-        });
-        grid.appendChild(field);
+        const s = f.sub || "";
+        if (!(s in bySub)) { bySub[s] = []; order.push(s); }
+        bySub[s].push(f);
       });
+
+      order.forEach((s) => {
+        const block = h(`<div class="cms-subblock">${s ? `<div class="cms-subhead">${esc(s)}</div>` : ""}</div>`);
+        bySub[s].forEach((f) => {
+          const val = original[f.key] != null ? original[f.key] : "";
+          const big = f.type === "textarea";
+          const field = h(`<div class="cms-field" data-key="${esc(f.key)}">
+            <label>${esc(f.label)}</label>
+            ${big ? `<textarea rows="3"></textarea>` : `<input type="text">`}
+          </div>`);
+          const input = field.querySelector(big ? "textarea" : "input");
+          input.value = val;
+          input.addEventListener("input", () => {
+            field.classList.toggle("cms-dirty", input.value !== val);
+            updateCount(det);
+          });
+          block.appendChild(field);
+        });
+        gbody.appendChild(block);
+      });
+
       body.appendChild(det);
       updateCount(det);
     });
