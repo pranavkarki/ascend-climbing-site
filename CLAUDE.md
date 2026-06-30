@@ -12,9 +12,13 @@ This file is a **map**. The detailed "why" behind tricky animation/layout decisi
 |------|---------|
 | `index.html` | Main page: Landing → Pricing → Activities (Kids/Adult courses, Rock Day) → Features (Cafe/Training Room) → Testimonials → FAQ → About → Footer |
 | `cafe.html` | Standalone cafe menu page |
-| `stories.html` | Field Notes page: blog/events/rock-day listing + inline article view. All JS is inline. Loads `posts.js` then renders everything via vanilla JS. |
+| `stories.html` | Field Notes page: blog/events/rock-day listing + inline article view. All JS is inline. Loads `posts.data.js` **then** `posts.js`, then renders everything via vanilla JS. |
 | `stories.css` | All styles for the Field Notes page. Scoped to `.fn-*` to avoid collision with `styles.css`. `.fn-view` is the grid container (260px sidebar + 1fr main). |
-| `posts.js` | Post data array (`POSTS`), full article bodies (`BODIES`), and utilities (`ENTRY_NUM`, `POST_FILTERS`, `CAT_LABEL`, `DETAIL_LABELS`, `parsePostDate`, `bodyFor`). Edit here to add/update posts. |
+| `posts.data.js` | **Post DATA only** — `POSTS` array + `BODIES` map literals. Machine-editable: the CMS rewrites this whole file (`/admin` → Field Notes → `/api/posts`). Hand-editable too; keep it to plain `const POSTS=[…]; const BODIES={…};`. Loaded before `posts.js`. |
+| `posts.js` | Field Notes **utilities** only (`ENTRY_NUM`, `POST_FILTERS`, `CAT_LABEL`, `DETAIL_LABELS`, `parsePostDate`, `bodyFor`). Reads the `POSTS`/`BODIES` globals from `posts.data.js`. Split from data so the CMS only ever serializes pure data. |
+| `admin.html` / `admin.css` / `admin.js` | Password-protected CMS SPA at `/admin` (`.cms-*` scoped). Two tabs: Site Content + Field Notes. See **CMS** section below. |
+| `cms-fields.js` | Shared config (browser `window.CMS_FIELDS` + node `require`) listing every editable `data-cms` field (key/label/group/type) and the JSON-LD price-sync mapping. Single source of truth for the Site Content editor. |
+| `api/` | Vercel serverless functions (Node, zero-config, no npm — built-in `crypto` + global `fetch` only). `_lib/` = github commit + auth + html/posts helpers; `login`/`logout`/`session` = auth; `content` = site-content GET/PUT; `posts` = blog GET/PUT; `upload` = cover-image commit. |
 | `styles.css` | All styles (single file) |
 | `main.js` | All JS (single file), runs on `DOMContentLoaded` |
 | `img/square/` | 9 photos (currently unused) |
@@ -117,6 +121,28 @@ Pure static site: no backend, forms, auth, secrets, or API keys, so attack surfa
 - **`Permissions-Policy` disables powerful features the site doesn't use** (camera, microphone, geolocation, payment, usb, etc.; `fullscreen=(self)` is allowed). This is deliberate hardening — **if you add a feature that needs one of these (e.g. an embedded map = `geolocation`, a video that autoplays = `autoplay`), change that feature from `()` to `(self)` in the `Permissions-Policy` value in `vercel.json`**, otherwise the API will be unavailable.
 - **CDN scripts use Subresource Integrity (SRI):** every `<script src="https://cdn…">` (Lenis, GSAP, ScrollTrigger, SplitType) in `index.html`/`stories.html`/`cafe.html` carries a `integrity="sha384-…"` + `crossorigin="anonymous"`. If you **bump a CDN library version**, the old hash will no longer match and the script will refuse to load — recompute the hash: `curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A` and update the `integrity` attr in **all three** HTML files.
 - `.vercel/`, `.vercel-codes`, `.env*`, `.DS_Store` are gitignored and have never been committed (verified across full history). GitHub secret-scanning + push-protection are enabled on the public repo.
+- **The site is no longer purely static** — `/api/*` adds a thin serverless backend for the CMS (see below). It still uses **no npm/build**: Vercel auto-detects `api/*.js` as Node functions, and they import only built-in `crypto` + global `fetch`. The functions never ship secrets to the client (the GitHub token lives only in serverless env). The CMS works under the existing CSP unchanged (`connect-src 'self'` covers same-origin `/api`; `admin.html` uses the already-allowed Google Fonts + `self` scripts + `data:` images).
+
+---
+
+## CMS — no-code editor (`/admin`)
+
+A password-protected SPA at **`/admin`** lets the owner edit the site without code. **Edits are committed to the GitHub repo via the Contents API, which triggers a Vercel redeploy (~1–2 min).** The site stays fully static/SEO-friendly; every edit is a versioned commit. Architecture confirmed with the owner; the alternative (live DB + runtime injection) was rejected to keep the site static.
+
+**Env vars (set in Vercel dashboard — none are committed):** `ADMIN_PASSWORD` (login), `ADMIN_SESSION_SECRET` (HMAC signing key for the session cookie), `GITHUB_TOKEN` (fine-grained PAT scoped to THIS repo, Contents read/write), `GITHUB_REPO` (`owner/repo`), `GITHUB_BRANCH` (optional, default `main`).
+
+**Auth:** `/api/login` constant-time-compares the password and sets an httpOnly/Secure/SameSite=Strict signed cookie (`cms_session`, 8h, HMAC-SHA256 in `api/_lib/auth.js`). Every protected endpoint calls `requireAuth(req)`. There's a 400ms fixed delay on login (functions are stateless → no real rate-limit; pair with a strong password). `/admin` + `/api/*` carry `X-Robots-Tag: noindex` + `Cache-Control: no-store` (in `vercel.json`).
+
+**Site Content editor (prices / timings / text):**
+- Editable values are marked in the HTML with **`data-cms="<key>"`** attributes (on `index.html` + `cafe.html`). The API rewrites ONLY the inner text of those elements — surrounding markup/classes are never touched, so formatting can't break. **Phase-1 elements all have plain-text inner content (no nested tags)**, so `api/_lib/content-html.js` uses an anchored regex (no DOM parser). Values are HTML-escaped on write / unescaped on read.
+- **`cms-fields.js` is the single source of truth** mapping each `data-cms` key → label/group/type/file. To make a new element editable: add `data-cms="group.key"` in the HTML **and** a matching field entry in `cms-fields.js` — nothing else.
+- **JSON-LD price sync:** after saving `index.html`, `syncPriceRange()` recomputes the `SportsActivityLocation` `priceRange` from the min/max of the membership/day-pass prices (keys listed in `cms-fields.js` → `jsonLd.priceRangeFrom`), so SEO structured data never drifts from the visible prices.
+
+**Field Notes (blog) editor:** edits `posts.data.js`. `/api/posts` GET parses it (runs it in a `vm` sandbox to capture `POSTS`/`BODIES`); PUT validates (required fields, unique integer `id`, `cat` ∈ event/story/rock, `DD.MM.YY` date, `details` keys ∈ allowed set) then **serializes the whole file as JSON-literal JS** and commits. The editor UI covers all post fields + `details` rows + optional long-form body (dek, caption, repeatable Section/Quote blocks with drop-cap, sign-off, tags). Cover images: `admin.js` resizes to ≤1200px wide and re-encodes to **WebP via `<canvas>` client-side** (no server image tooling — AVIF recipe needs the CLI), then `/api/upload` commits it to `img/stories/{slug}.webp`. `imgTag` in `stories.html` already degrades gracefully if an image is missing.
+
+**Phase 2 (NOT built yet — deliberately deferred):** testimonials (rating + text) and FAQ answers. They embed decorative `<span>`s / tables mid-sentence, so they need a real HTML parser + structured sub-editor, not the plain-text `data-cms` path. The owner wants testimonials editable eventually (ratings/text change over time) — leave their elements unmarked until that phase.
+
+**If you change nav/clock behavior** remember `stories.html` still duplicates that logic inline (unchanged by the CMS work).
 
 ---
 
