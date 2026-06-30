@@ -70,6 +70,7 @@
       <div class="cms-brand">Ascend <small>Site Editor</small></div>
       <div class="cms-tabs">
         <button class="cms-tab" data-tab="content">Site Content</button>
+        <button class="cms-tab" data-tab="menu">Menu</button>
         <button class="cms-tab" data-tab="posts">Field Notes</button>
       </div>
       <button class="cms-iconbtn" data-logout>Log out</button>
@@ -88,7 +89,7 @@
     root.querySelectorAll(".cms-tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
     const body = document.getElementById("cms-body");
     body.innerHTML = `<p style="color:#8a8a8a">Loading…</p>`;
-    (tab === "posts" ? renderPosts : renderContent)(body);
+    (tab === "posts" ? renderPosts : tab === "menu" ? renderMenu : renderContent)(body);
   }
 
   // =========================================================================
@@ -197,6 +198,112 @@
       });
     });
     body.querySelectorAll(".cms-group [data-count]").forEach((c) => (c.textContent = ""));
+  }
+
+  // =========================================================================
+  // MENU (cafe)
+  // =========================================================================
+  let MENU = [];        // [{ title, items: [{ name, price }] }]
+  let menuDirty = false;
+
+  async function renderMenu(body) {
+    try { const d = await api("/api/menu"); MENU = d.sections || []; menuDirty = false; }
+    catch (e) { body.innerHTML = `<p class="cms-status err">${esc(e.message)}</p>`; return; }
+    drawMenu(body);
+  }
+
+  function markMenuDirty(body) {
+    menuDirty = true;
+    const b = body.querySelector("[data-publish]");
+    if (b) b.disabled = false;
+  }
+
+  function drawMenu(body) {
+    body.innerHTML = "";
+    body.appendChild(h(`<div class="cms-row" style="justify-content:space-between">
+      <strong style="text-transform:uppercase;letter-spacing:.04em">Cafe Menu</strong>
+      <button class="cms-iconbtn" data-add-sec>+ Add section</button>
+    </div>`));
+    body.querySelector("[data-add-sec]").addEventListener("click", () => {
+      MENU.push({ title: "New Section", items: [] }); markMenuDirty(body); drawMenu(body);
+    });
+
+    MENU.forEach((sec, si) => {
+      const block = h(`<div class="cms-block cms-menu-sec">
+        <div class="cms-block-head">
+          <input class="cms-menu-sec-title" type="text" data-sec-title>
+          <button class="cms-iconbtn danger" data-del-sec>Delete section</button>
+        </div>
+        <div data-items></div>
+        <button class="cms-iconbtn" data-add-item>+ Add item</button>
+      </div>`);
+      const titleInp = block.querySelector("[data-sec-title]");
+      titleInp.value = sec.title;
+      titleInp.addEventListener("input", () => { sec.title = titleInp.value; markMenuDirty(body); });
+      block.querySelector("[data-del-sec]").addEventListener("click", () => {
+        if (!confirm(`Delete the "${sec.title}" section and its items?`)) return;
+        MENU.splice(si, 1); markMenuDirty(body); drawMenu(body);
+      });
+
+      const itemsWrap = block.querySelector("[data-items]");
+      sec.items.forEach((it, ii) => itemsWrap.appendChild(menuItemRow(body, sec, it, ii)));
+      block.querySelector("[data-add-item]").addEventListener("click", () => {
+        sec.items.push({ name: "New item", price: "", __edit: true }); markMenuDirty(body); drawMenu(body);
+      });
+      body.appendChild(block);
+    });
+
+    const bar = h(`<div class="cms-actions">
+      <span class="cms-status" data-status></span>
+      <button class="cms-btn" data-publish ${menuDirty ? "" : "disabled"}>Publish menu</button>
+    </div>`);
+    body.appendChild(bar);
+    bar.querySelector("[data-publish]").addEventListener("click", () => publishMenu(body, bar));
+  }
+
+  function menuItemRow(body, sec, it, ii) {
+    const row = h(`<div class="cms-menu-item"></div>`);
+    const draw = () => {
+      row.innerHTML = "";
+      if (it.__edit) {
+        row.classList.add("editing");
+        const name = h(`<input class="mi-name" type="text" placeholder="Item name">`);
+        const price = h(`<input class="mi-price" type="text" placeholder="Price">`);
+        name.value = it.name; price.value = it.price;
+        name.addEventListener("input", () => { it.name = name.value; markMenuDirty(body); });
+        price.addEventListener("input", () => { it.price = price.value; markMenuDirty(body); });
+        const done = h(`<button class="cms-iconbtn" title="Done">✓</button>`);
+        const del = h(`<button class="cms-iconbtn danger" title="Remove">✕</button>`);
+        done.addEventListener("click", () => { it.__edit = false; draw(); });
+        del.addEventListener("click", () => { sec.items.splice(ii, 1); markMenuDirty(body); drawMenu(body); });
+        row.append(name, price, done, del);
+      } else {
+        row.classList.remove("editing");
+        const name = h(`<span class="mi-name">${esc(it.name)}</span>`);
+        const price = h(`<span class="mi-price">${esc(it.price) || "<em style='opacity:.5'>no price</em>"}</span>`);
+        const edit = h(`<button class="cms-iconbtn" title="Edit">✎</button>`);
+        const del = h(`<button class="cms-iconbtn danger" title="Remove">✕</button>`);
+        edit.addEventListener("click", () => { it.__edit = true; draw(); });
+        del.addEventListener("click", () => { if (confirm(`Remove "${it.name}"?`)) { sec.items.splice(ii, 1); markMenuDirty(body); drawMenu(body); } });
+        row.append(name, price, edit, del);
+      }
+    };
+    draw();
+    return row;
+  }
+
+  async function publishMenu(body, bar) {
+    const btn = bar.querySelector("[data-publish]");
+    const status = bar.querySelector("[data-status]");
+    const sections = MENU.map((s) => ({ title: s.title, items: s.items.map((it) => ({ name: it.name, price: it.price })) }));
+    btn.disabled = true; status.className = "cms-status"; status.textContent = "Publishing…";
+    try {
+      await api("/api/menu", { method: "PUT", body: { sections } });
+      menuDirty = false;
+      status.className = "cms-status ok"; status.textContent = "Saved — live in ~1–2 min.";
+    } catch (e) {
+      status.className = "cms-status err"; status.textContent = e.message; btn.disabled = false;
+    }
   }
 
   // =========================================================================

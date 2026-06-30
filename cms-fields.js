@@ -117,28 +117,7 @@ const CMS_FIELDS = {
         { key: "text.about",            label: "Body",        type: "textarea", sub: "About" },
       ],
     },
-    {
-      id: "cafe", label: "Cafe Menu", file: "cafe.html",
-      fields: [
-        { key: "cafe.coffee.espresso",     label: "Espresso/Doppio",  type: "text", sub: "Coffee" },
-        { key: "cafe.coffee.americano",    label: "Americano",        type: "text", sub: "Coffee" },
-        { key: "cafe.coffee.cappuccino",   label: "Cappuccino/Latte", type: "text", sub: "Coffee" },
-        { key: "cafe.tea.black",           label: "Black/Milk/Lemon", type: "text", sub: "Tea & Refreshers" },
-        { key: "cafe.tea.iced",            label: "Iced Tea",         type: "text", sub: "Tea & Refreshers" },
-        { key: "cafe.tea.hotlemon",        label: "Hot Lemon",        type: "text", sub: "Tea & Refreshers" },
-        { key: "cafe.food.momo",           label: "Momo",             type: "text", sub: "Food" },
-        { key: "cafe.food.chowmein",       label: "Chowmein",         type: "text", sub: "Food" },
-        { key: "cafe.food.friedrice",      label: "Fried Rice",       type: "text", sub: "Food" },
-        { key: "cafe.food.sandwich",       label: "Sandwich",         type: "text", sub: "Food" },
-        { key: "cafe.food.honeybanana",    label: "Honey Banana PB",  type: "text", sub: "Food" },
-        { key: "cafe.food.chickensalad",   label: "Grilled Chicken Salad", type: "text", sub: "Food" },
-        { key: "cafe.food.veggiesalad",    label: "Mix Veggie Salad", type: "text", sub: "Food" },
-        { key: "cafe.sides.fries",         label: "French Fries",     type: "text", sub: "Sides" },
-        { key: "cafe.sides.chillichicken", label: "Chilli Chicken",   type: "text", sub: "Sides" },
-        { key: "cafe.sides.hotwings",      label: "Hot Wings",        type: "text", sub: "Sides" },
-        { key: "cafe.sides.sandeko",       label: "Chicken Sandeko",  type: "text", sub: "Sides" },
-      ],
-    },
+    // NOTE: the cafe menu is edited in its own "Menu" tab (api/menu.js), not here.
   ],
 
   // JSON-LD sync: after a save to index.html, the SportsActivityLocation

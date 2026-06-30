@@ -91,4 +91,15 @@ textarea { resize: vertical; min-height: 64px; }
 .cms-checkbox input { width: auto; }
 .cms-checkbox label { margin: 0; }
 hr.cms-sep { border: none; border-top: 1px solid var(--cms-line); margin: 18px 0; }
+
+/* Menu editor */
+.cms-menu-sec { padding: 12px 14px; }
+.cms-menu-sec-title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; max-width: 320px; }
+.cms-menu-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--cms-line); }
+.cms-menu-item:last-of-type { border-bottom: none; }
+.cms-menu-item .mi-name { flex: 1; }
+.cms-menu-item .mi-price { color: var(--cms-muted); min-width: 70px; text-align: right; }
+.cms-menu-item input.mi-name { flex: 1; }
+.cms-menu-item input.mi-price { max-width: 150px; }
+.cms-menu-item .cms-iconbtn { padding: 5px 9px; }
 @media (max-width: 640px) { .cms-grid2 { grid-template-columns: 1fr; } }
