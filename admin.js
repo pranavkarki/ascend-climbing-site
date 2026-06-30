@@ -101,6 +101,21 @@
     const original = data.values || {};
     body.innerHTML = "";
 
+    // Build the action bar + helpers FIRST so they exist before any group renders
+    // (the per-group updateCount() calls refreshSave()).
+    const bar = h(`<div class="cms-actions">
+      <span class="cms-status" data-status></span>
+      <button class="cms-btn" data-save disabled>Publish changes</button>
+    </div>`);
+    const saveBtn = bar.querySelector("[data-save]");
+    const status = bar.querySelector("[data-status]");
+    const refreshSave = () => { saveBtn.disabled = body.querySelectorAll(".cms-dirty").length === 0; };
+    const updateCount = (det) => {
+      const n = det.querySelectorAll(".cms-dirty").length;
+      det.querySelector("[data-count]").textContent = n ? `${n} changed` : "";
+      refreshSave();
+    };
+
     CMS_FIELDS.groups.forEach((g, gi) => {
       const det = h(`<details class="cms-group" ${gi === 0 ? "open" : ""}>
         <summary>${esc(g.label)} <span class="cms-badge" data-count></span></summary>
@@ -129,22 +144,8 @@
       updateCount(det);
     });
 
-    const bar = h(`<div class="cms-actions">
-      <span class="cms-status" data-status></span>
-      <button class="cms-btn" data-save disabled>Publish changes</button>
-    </div>`);
     body.appendChild(bar);
-
-    const saveBtn = bar.querySelector("[data-save]");
-    const status = bar.querySelector("[data-status]");
-    const refreshSave = () => { saveBtn.disabled = body.querySelectorAll(".cms-dirty").length === 0; };
     body.addEventListener("input", refreshSave);
-
-    function updateCount(det) {
-      const n = det.querySelectorAll(".cms-dirty").length;
-      det.querySelector("[data-count]").textContent = n ? `${n} changed` : "";
-      refreshSave();
-    }
 
     saveBtn.addEventListener("click", async () => {
       const values = {};
