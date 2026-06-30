@@ -8,3 +8,4 @@
 progress.md
 .vercel
 .vercel-codes
+.env*
