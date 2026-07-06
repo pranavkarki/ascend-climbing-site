@@ -11,6 +11,7 @@
   --cms-blue: #0000CD;
   --cms-danger: #ff4d4d;
   --cms-card: #161616;
+  color-scheme: dark; /* native widgets (date picker) match the dark theme */
 }
 * { box-sizing: border-box; }
 html, body {
@@ -19,6 +20,9 @@ html, body {
   font-size: 14px; line-height: 1.5;
 }
 .cms-wrap { max-width: 920px; margin: 0 auto; padding: 24px 18px 96px; }
+/* Visual editor mode: let the homepage preview use the full window width so
+   its media queries resolve to the desktop layout, not the mobile one. */
+body.cms-fullbleed .cms-wrap { max-width: none; }
 a { color: var(--cms-fg); }
 
 /* ---- header / tabs ---- */
@@ -39,15 +43,17 @@ a { color: var(--cms-fg); }
 
 /* ---- forms ---- */
 label { display: block; color: var(--cms-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
-input[type="text"], input[type="password"], input[type="number"], select, textarea {
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
   width: 100%; background: var(--cms-card); border: 1px solid var(--cms-line); color: var(--cms-fg);
   padding: 9px 10px; font: inherit; border-radius: 0;
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--cms-accent); }
 textarea { resize: vertical; min-height: 64px; }
 .cms-field { margin-bottom: 16px; }
+.cms-field.cms-invalid input, .cms-field.cms-invalid textarea { border-color: var(--cms-danger); }
+.cms-field-err { color: var(--cms-danger); font-size: 12px; margin: 4px 0 0; }
 
-/* groups (site content) */
+/* groups (site content list view) */
 .cms-group { border: 1px solid var(--cms-line); margin-bottom: 14px; }
 .cms-group > summary { cursor: pointer; padding: 12px 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; list-style: none; display: flex; justify-content: space-between; }
 .cms-group > summary::-webkit-details-marker { display: none; }
@@ -66,21 +72,55 @@ textarea { resize: vertical; min-height: 64px; }
 .cms-dirty input, .cms-dirty textarea { border-color: var(--cms-blue); }
 .cms-badge { color: var(--cms-accent); font-size: 11px; }
 
+/* ---- visual editor (site content) ---- */
+.cms-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.cms-toolhint { color: var(--cms-muted); font-size: 12px; flex: 1; min-width: 240px; }
+.cms-toolhint b { color: var(--cms-fg); font-weight: 700; }
+.cms-jump { width: auto; max-width: 220px; }
+.cms-preview { display: block; width: 100%; height: calc(100vh - 250px); min-height: 480px; border: 1px solid var(--cms-line); background: var(--cms-bg); }
+.cms-pending { color: var(--cms-accent); }
+
 /* buttons / actions */
 .cms-btn { background: var(--cms-fg); color: var(--cms-bg); border: 1px solid var(--cms-fg); padding: 10px 18px; cursor: pointer; font: inherit; text-transform: uppercase; letter-spacing: .05em; }
 .cms-btn:disabled { opacity: .4; cursor: default; }
 .cms-btn.ghost { background: none; color: var(--cms-fg); }
 .cms-btn.danger { background: none; color: var(--cms-danger); border-color: var(--cms-danger); }
+.cms-btn.danger-solid { background: var(--cms-danger); border-color: var(--cms-danger); color: #fff; }
 .cms-actions { position: fixed; left: 0; right: 0; bottom: 0; background: var(--cms-bg); border-top: 1px solid var(--cms-line); padding: 12px 18px; display: flex; align-items: center; gap: 14px; justify-content: flex-end; z-index: 10; }
 .cms-status { margin-right: auto; color: var(--cms-muted); }
 .cms-status.ok { color: var(--cms-accent); }
 .cms-status.err { color: var(--cms-danger); }
+
+/* ---- modals ---- */
+.cms-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .7); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.cms-modal { background: var(--cms-bg); border: 1px solid var(--cms-line); padding: 22px; width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; }
+.cms-modal.wide { max-width: 760px; }
+.cms-modal.full { max-width: none; height: 100%; max-height: none; padding: 0; display: flex; overflow: hidden; }
+.cms-modal-title { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; letter-spacing: .05em; }
+.cms-modal-msg { color: var(--cms-muted); margin: 10px 0 0; }
+.cms-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* review-changes diff rows */
+.cms-diff { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.cms-diff-row { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--cms-line); padding: 10px 12px; }
+.cms-diff-label { color: var(--cms-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; width: 200px; flex-shrink: 0; padding-top: 2px; }
+.cms-diff-vals { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: break-word; }
+.cms-diff-vals del { color: var(--cms-danger); opacity: .85; }
+.cms-diff-vals ins { color: var(--cms-accent); text-decoration: none; }
+.cms-diff-row .cms-iconbtn { flex-shrink: 0; }
+
+/* full-screen article preview */
+.cms-previewpost { display: flex; flex-direction: column; width: 100%; height: 100%; }
+.cms-previewpost-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--cms-line); text-transform: uppercase; letter-spacing: .05em; font-size: 12px; color: var(--cms-muted); }
+.cms-previewpost-frame { flex: 1; width: 100%; border: none; background: var(--cms-bg); }
 
 /* posts list */
 .cms-postrow { display: flex; align-items: center; gap: 12px; border: 1px solid var(--cms-line); padding: 10px 12px; margin-bottom: 8px; }
 .cms-postrow .meta { color: var(--cms-muted); font-size: 12px; }
 .cms-postrow .title { flex: 1; }
 .cms-postrow .pin { color: var(--cms-accent); }
+.cms-postthumb { width: 44px; height: 44px; object-fit: cover; filter: grayscale(1); border: 1px solid var(--cms-line); flex-shrink: 0; }
+.cms-postthumb.empty { display: inline-block; background: var(--cms-card); }
 .cms-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
 .cms-row > * { margin-bottom: 0; }
 .cms-block { border: 1px solid var(--cms-line); padding: 12px; margin-bottom: 10px; }
